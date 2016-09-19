@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<purity-config version="10.5.0.ga-2016-06-24">
+	<references/>
+	<component-mappings>
+		<propertyMappings/>
+	</component-mappings>
+
+<!-- (Canopy Clustering) --><step id="Canopy Clustering" className="com.ataccama.dqc.tasks.match.CanopyClustering" disabled="false" mode="NORMAL">
+		<properties looseThreshold="0.9" multiplicative="true" tightThreshold="0.95" minimalIndex="0.0">
+			<components/>
+			<sortOrder/>
+		</properties>
+		<visual-constraints bounds="264,120,-1,-1" layout="vertical"/>
+	</step>
+
+
+
+<!-- (Dictionary Lookup Identifier) --><step id="Dictionary Lookup Identifier" className="com.ataccama.dqc.tasks.addresses.dictionary.DictionaryLookupIdentifier" disabled="false" mode="NORMAL">
+		<properties maxScoreToAcceptVector="0">
+			<componentOutputMapping/>
+			<components/>
+			<expertSettings advancedScoring="false" approximativeSearchImmediately="false">
+				<evaluatorDefinition class="com.ataccama.dqc.tasks.addresses.dictionary.evaluation.SingleComponentElementEvaluatorDefinition"/>
+				<inputSearchMethod class="com.ataccama.dqc.tasks.addresses.dictionary.model.searching.SingleComponentElementSearchMethod"/>
+			</expertSettings>
+			<inputLayout>
+				<elements/>
+			</inputLayout>
+			<limitOutputProposals/>
+			<limitRatedProposals/>
+			<ratings/>
+			<scoring/>
+			<supportingVectorCases/>
+		</properties>
+		<visual-constraints bounds="72,312,-1,-1" layout="vertical"/>
+	</step>
+
+
+
+<!-- (Extended Unification) --><step id="Extended Unification" className="com.ataccama.dqc.unify.ExtendedUnify" disabled="false" mode="NORMAL">
+		<properties minimumIdToAssign="1" directUpdate="false" readOnly="false" processingMode="NORMAL" mapAllColumns="true" exclusiveMode="true">
+			<operations/>
+			<outputStrategy exportDiscarded="false" exportUnchanged="true"/>
+			<repositoryColumns/>
+		</properties>
+		<visual-constraints bounds="408,288,-1,-1" layout="vertical"/>
+	</step>
+
+
+
+<!-- (Seed Table) --><step id="Seed Table" className="com.ataccama.dqc.tasks.clean.SeedTable" disabled="false" mode="NORMAL">
+		<properties commitSize="1000" batchSize="1" maximumStringLength="100">
+			<scorer>
+				<scoringEntries>
+					<scoringEntry score="0" explainAs="ST_NULL" explain="true" key="ST_NULL"/>
+					<scoringEntry score="0" explainAs="ST_FOUND" explain="true" key="ST_FOUND"/>
+					<scoringEntry score="0" explainAs="ST_INSERTED" explain="true" key="ST_INSERTED"/>
+					<scoringEntry score="0" explainAs="ST_NOT_FOUND" explain="true" key="ST_NOT_FOUND"/>
+				</scoringEntries>
+			</scorer>
+		</properties>
+		<visual-constraints bounds="288,432,-1,-1" layout="vertical"/>
+	</step>
+
+
+
+<modelComment bounds="48,120,193,49" borderColor="183,183,0" backgroundColor="255,0,128" foregroundColor="51,51,51">pridani druheho planu do mastra</modelComment>
+
+</purity-config>
