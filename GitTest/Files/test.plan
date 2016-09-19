@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<purity-config version="10.5.0.ga-2016-06-24">
+	<references/>
+	<component-mappings>
+		<propertyMappings/>
+	</component-mappings>
+
+<!-- (Guess Name Surname) --><step id="Guess Name Surname" className="com.ataccama.dqc.tasks.clean.GuessNameSurnameAlgorithm" disabled="false" mode="NORMAL">
+		<properties interlacedWordDefinition="{INTERLACED_WORD}" wordDefinition="{WORD}" proposalSelectionStrategy="DISTANCE_BASED" fullTrashScope="false" multiWordDefinition="{MULTIWORD:wordSeparators=&quot;-&#39;`&quot;&quot;~&quot;}" preserveIfDiffers="PRESERVE_NONE" multiWordSeparators=" ">
+			<components/>
+			<hints/>
+			<patternGroups/>
+			<scorer>
+				<scoringEntries>
+					<scoringEntry score="0" explainAs="NM_NULL" explain="true" key="NM_NULL"/>
+					<scoringEntry score="0" explainAs="NM_NO_PATTERN" explain="true" key="NM_NO_PATTERN"/>
+					<scoringEntry score="0" explainAs="NM_PART_PATTERN" explain="true" key="NM_PART_PATTERN"/>
+					<scoringEntry score="0" explainAs="NM_MORE_PATTERNS" explain="true" key="NM_MORE_PATTERNS"/>
+					<scoringEntry score="0" explainAs="NM_DIFFERENT" explain="true" key="NM_DIFFERENT"/>
+					<scoringEntry score="0" explainAs="NM_HINT" explain="true" key="NM_HINT"/>
+					<scoringEntry score="0" explainAs="NM_TRASH" explain="true" key="NM_TRASH"/>
+				</scoringEntries>
+			</scorer>
+			<tokenizerConfig whiteSpaceDefinition="[:white:]">
+				<types>
+					<tokenType tokenStartCharacters="[:letter:]" tokenCharacters="[:letter:]"/>
+					<tokenType tokenStartCharacters="[:digit:]" tokenCharacters="[:digit:]"/>
+				</types>
+			</tokenizerConfig>
+		</properties>
+		<visual-constraints bounds="264,96,-1,-1" layout="vertical"/>
+	</step>
+
+
+
+<modelComment bounds="72,48,97,73" borderColor="183,183,0" backgroundColor="255,255,180" foregroundColor="51,51,51">test commennt</modelComment>
+
+</purity-config>
