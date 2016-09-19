@@ -1,0 +1,791 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="SystemsNode" icon="icons/server_earth.png" sortChildren="false" name="systems" label="Connected Systems">
+			<subNodes>
+				<subNode min="0" id="SystemNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="." class="com.ataccama.ame.core.editors.CreateChild" label="New System...">
+				</editor>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>system/@name</selectPath>
+					<message>Duplicate system name &quot;{.}&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>system/@name|/logicalModel/masterModels/masterModel/guiConfig[@enableGui=&#39;true&#39; and @guiMode=&#39;Read-Write&#39;]/@guiSystem</selectPath>
+					<message>System name &quot;{.}&quot; is currently used for the GUI. If you want to configure a batch load operation, go to GUI Configuration under a Master Data Layer. <!-- 1000 --></message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>system/sourceMappings/mapping/@name</selectPath>
+					<message>Duplicate mapping name &quot;{.}&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>system/sourceMappings/mapping/@id</selectPath>
+					<message>Duplicate mapping id &quot;{.}&quot;.</message>
+				</validation>
+			</validations>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltGenerator">
+					<fileNameTemplate>Files/etc/nme-batch.gen.xml</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+						<param source="/outputOperations/exportModel" name="exportModel"/>
+						<param source="/settings" name="settings"/>
+						<param source="/advancedSettings" name="advancedSettings"/>
+						<param source="/logicalModel" name="logicalModel"/>
+					</parameters>
+					<templatePath>xslt/gen_batch_xml.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>The node holds configuration of systems that the MDM Hub will process in batch and/or online modes. Each &lt;i&gt;Connected System&lt;/i&gt; has: source model, source mapping and batch load operation settings.</description>
+		</node>
+		<node id="SystemNode" icon="icons/server_connection.png" sortChildren="false" name="system" label="{@name}" explorerLeaf="false">
+			<subNodes>
+				<subNode min="1" id="ModelNode" max="1"/>
+				<subNode min="1" id="SourceMappingsNode" max="1"/>
+				<subNode min="1" id="LoadOperationsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="name" label="System Name" type="string" required="true">
+					<description>Short and descriptive name for new source system (e.g. CRM). It will be used later as a part of the name for load operation. It is also available in transformation plans as &lt;kbd&gt;eng_source_system&lt;/kbd&gt;</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Add more details about your source system in the description field</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor targetNodePath="." class="com.ataccama.ame.core.editors.PropertyEditor" label="Edit..."/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete"/>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+		</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr><!-- TODO: only lowercase characters??? --><message>System name {@name} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+			<description>The Connected system unique configuration of source model, source mapping and batch load operation settings.</description>
+		</node>
+		<node id="ModelNode" abstract="false" icon="icons/entities.png" visible="true" name="model" label="Model: {../@name} " explorerLeaf="false">
+			<references>
+				<reference parentId="tables/table/@name">
+					<idRefs>
+						<idRef childId="relationships/relationship/@parentTable"/>
+						<idRef childId="relationships/relationship/@childTable"/>
+					</idRefs>
+				</reference>
+			</references>
+			<subNodes>
+				<subNode min="1" id="RelationshipsNode" max="1"/>
+				<subNode min="1" id="TablesNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.RelationEditor" label="Edit Schema">
+					<tableTypes>
+						<tableType icon="icons/table.png" name="Table">
+							<tableContainerSelectorPath>tables</tableContainerSelectorPath>
+							<tableNamePath>@name</tableNamePath>
+							<columnSelectorPath>columns/column</columnSelectorPath>
+							<columnDisplayTemplate>{@name}: {@type}</columnDisplayTemplate>
+							<entityColorings>
+								<coloring test="." color="#dd00dd"/>
+							</entityColorings>
+						</tableType>
+					</tableTypes>
+					<relationshipTypes>
+						<relationshipType name="Relationship">
+							<relationshipContainerSelectorPath>relationships
+							</relationshipContainerSelectorPath>
+							<relationshipNamePath>@name</relationshipNamePath>
+							<relationshipParentPath>@parentTable</relationshipParentPath>
+							<relationshipChildPath>@childTable</relationshipChildPath>
+						</relationshipType>
+					</relationshipTypes>
+				</editor>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="tables" class="com.ataccama.ame.core.editors.CreateChild" label="New table">
+	
+		</editor>
+				<editor class="com.ataccama.ame.core.imports.XmlStructureImporter" label="Import Logical/Physical PowerDesigner Model" xsltTemplate="xslt/import_input_model.xsl">
+					<debug>false</debug>
+					<structure>
+						<node containerPath="tables" matchTemplate="{@name}" attributeFilter="name,description" displayTemplate="Table {@name}" deletions="ACCEPT">
+							<subNodes>
+								<node containerPath="columns" additions="ACCEPT" matchTemplate="{@name}" attributeFilter="name,type,description" displayTemplate="Column {@name}: {@type}" deletions="ACCEPT">
+        </node>
+							</subNodes>
+						</node>
+						<node containerPath="relationships" matchTemplate="{@name}-{@parentTable}-{@childTable}" attributeFilter="name,parentTable,childTable" displayTemplate="Rel {@name}" deletions="ACCEPT">
+							<subNodes>
+								<node containerPath="foreignKey" additions="ACCEPT" matchTemplate="{@parentColumn}-{@childColumn}" attributeFilter="parentColumn,childColumn" displayTemplate="{@parentColumn}-&gt;{@childColumn}" deletions="ACCEPT">
+        </node>
+							</subNodes>
+						</node>
+					</structure>
+				</editor>
+				<editor class="com.ataccama.ame.core.imports.RelationalXmiImporter">
+					<entityContainerPath>tables</entityContainerPath>
+					<entityNamePath>@name</entityNamePath>
+					<entityCommentPath>@description</entityCommentPath>
+					<columnContainerPath>columns</columnContainerPath>
+					<columnNamePath>@name</columnNamePath>
+					<columnDbTypePath>@type</columnDbTypePath>
+					<columnCommentPath>@description</columnCommentPath>
+					<relationContainerPath>relationships</relationContainerPath>
+					<relationNamePath>@name</relationNamePath>
+					<relationParentTablePath>@parentTable</relationParentTablePath>
+					<relationChildTablePath>@childTable</relationChildTablePath>
+					<relationParentColumnPath>@parentColumn</relationParentColumnPath>
+					<relationChildColumnPath>@childColumn</relationChildColumnPath>
+					<relationFKContainer>foreignKey</relationFKContainer>
+				</editor>
+				<editor class="com.ataccama.ame.core.imports.DatabaseStructureImporter" label="Import Database Schema...">
+					<entityContainerPath>tables</entityContainerPath>
+					<entityNamePath>@name</entityNamePath>
+					<columnContainerPath>columns</columnContainerPath>
+					<columnNamePath>@name</columnNamePath>
+					<columnDbTypePath>@type</columnDbTypePath>
+					<relationContainerPath>relationships</relationContainerPath>
+					<relationNamePath>@name</relationNamePath>
+					<relationParentTablePath>@parentTable</relationParentTablePath>
+					<relationChildTablePath>@childTable</relationChildTablePath>
+					<relationParentColumnPath>@parentColumn</relationParentColumnPath>
+					<relationChildColumnPath>@childColumn</relationChildColumnPath>
+					<relationFKContainer>foreignKey</relationFKContainer>
+				</editor>
+			</editors>
+			<description>Connected system model provides structure and description of source extracts/formats.&lt;br/&gt;
+It is used for &lt;i&gt;Source Mappings&lt;/i&gt;. At the moment only &lt;i&gt;Table names&lt;/i&gt; are used in further configurations.</description>
+		</node><!-- tables --><node id="TablesNode" name="tables" label="Tables" expanded="true">
+			<subNodes>
+				<subNode min="0" id="TableNode" max="-1"/>
+			</subNodes>
+			<editors>
+				
+			</editors>
+			<description>List of tables (entities) loaded from the system</description>
+		</node>
+		<node id="TableNode" icon="icons/table.png" name="table" label="{@name}" explorerLeaf="true">
+			<attributes>
+				<attribute name="name" label="Table Name" type="string" required="true">
+					<description>Name of the source system table (entity)</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>User comment</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Table"/>
+			</editors>
+			<description>Table represents part of the interface between MDM Hub and the system. It is usually a model of real world object</description>
+		</node>
+		<node id="ColumnsNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ColumnNode" max="-1"/>
+			</subNodes>
+			<description>Table (entity) attributes loaded from connected system</description>
+		</node>
+		<node id="ColumnNode" name="column" label="{@name}:{@type}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Attribute name from the connected system</description>
+				</attribute>
+				<attribute name="type" label="Database Type" type="string" required="false">
+					<description>Data type (length) of the attribute in the connected system</description>
+				</attribute>
+				<attribute name="description" label="Description" type="string">
+					<description>User comment</description>
+				</attribute>
+			</attributes>
+			<description>Column of the table (entity) represents a characteristic of the object stored in the MDM Hub</description>
+		</node><!-- Logical data model: relationships --><node id="RelationshipsNode" icon="icons/graph_edge_directed.png" visible="true" name="relationships" label="Relationships" explorerLeaf="false" expanded="false">
+			<subNodes>
+				<subNode min="0" id="RelationshipNode" max="-1"/>
+			</subNodes>
+			<description>Entities from the system can have relations listed in the Connected system model interface</description>
+		</node>
+		<node id="RelationshipNode" icon="icons/graph_edge_directed.png" name="relationship" label="{@name}" explorerLeaf="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Relationship name mapped from the &lt;i&gt;Connected system&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="parentTable" label="Parent Table" type="list" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::model/tables/table/@name</selectPath>
+					</valuesProvider>
+					<description>Independent entity (e.g. Customer)</description>
+				</attribute>
+				<attribute name="childTable" label="Child Table" type="list" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::model/tables/table/@name</selectPath>
+					</valuesProvider>
+					<description>Dependent entity (e.g. Contact)</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ForeignKeyNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>The relationship represents a specific relation between source tables (entities)</description>
+		</node>
+		<node id="ForeignKeyNode" name="foreignKey" label="Foreign Key" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ForeignKeyItemNode" max="-1"/>
+			</subNodes>
+			<description>List of attributes comprising the foreign key</description>
+		</node>
+		<node id="ForeignKeyItemNode" name="column" label="{@parentColumn} &lt;- {@childColumn}" expanded="true">
+			<attributes>
+				<attribute name="parentColumn" label="Parent Key" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::model/tables/table[@name=$current/ancestor::relationship/@parentTable]/columns/column</selectPath>
+						<labelTemplate>{@name}</labelTemplate>
+						<valueTemplate>{@name}</valueTemplate>
+					</valuesProvider>
+					<description>Name of attribute comprising the primary key in the parent table</description>
+				</attribute>
+				<attribute name="childColumn" label="Child Key" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::model/tables/table[@name=$current/ancestor::relationship/@childTable]/columns/column</selectPath>
+						<labelTemplate>{@name}</labelTemplate>
+						<valueTemplate>{@name}</valueTemplate>
+					</valuesProvider>
+					<description>Name of attribute comprising the foreign key in the child table</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="LoadOperationsNode" icon="icons/import1.png" name="loadOperations" label="Load Operations">
+			<subNodes>
+				<subNode min="0" id="AbstractLoadOperationNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor" label="Edit Operations..."/>
+				<editor targetNodePath="." class="com.ataccama.ame.core.editors.CreateChild" label="New Operation..."/>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>./*/@nameSuffix</selectPath>
+					<message>Load operation name suffix &quot;{.}&quot; is not unique!</message>
+				</validation>
+			</validations>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Definition of several types of batch load operations. Both batch full and delta loads are available.&lt;br/&gt;
+If a connected system provides only online web service interfaces, no batch load operations are required.</description>
+		</node>
+		<node id="AbstractLoadOperationNode" abstract="true" icon="icons/scroll_run.png" name="abstractLoadOperation" label="Load Types" expanded="false">
+			<editors>
+				<editor showTree="false" openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Operation"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp"/>
+			</editors>
+			<attributes>
+				<attribute name="nameSuffix" label="Load Name Suffix" type="string" required="true">
+					<description>Load operation name suffix. The load operation name consists of the Connected System name concatenated with underscore and the Suffix (e.g. full -&gt; crm_full).</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+        
+      
+			
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allTables=&#39;true&#39; and selectedTables/table]</expression>
+					<message>Option &quot;All Entities&quot; enabled. Remove selected tables from the list or disable option &quot;All Entities&quot;.</message>
+				</validation><!--<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+			<expression>.[@allTables=&#39;true&#39;]|.[selectedTables/table]</expression>
+			<message>No entities defined for the given load operation!</message>
+		</validation>--></validations>
+			<description>Basic setting that is unique for each load operation. Usually defines entities loaded and operation behavior.</description>
+		</node>
+		<node id="SourceMappingsNode" visibleInParent="true" icon="icons/mappings.png" visible="true" name="sourceMappings" newTab="false" label="Source Mappings" explorerLeaf="true" expanded="false">
+			<subNodes>
+				<subNode min="0" id="SourceMappingNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>Definition of entity level mapping between a connected system model and the Instance Layer (i.e. canonical layer)</description>
+		</node>
+		<node id="SourceMappingNode" abstract="false" visibleInParent="true" visible="true" name="mapping" label="Mapping" explorerLeaf="false" expanded="false">
+			<attributes>
+				<attribute visible="true" name="table" label="Source Table" type="list" required="true">
+					<description>Name of the table from connected system. Values originate from the connected system model defined in previous dialog.</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::system/model/tables/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute visible="true" name="entity" label="Model Entity" type="list" required="true">
+					<description>Target (MDM hub) canonical model entity for given source table</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="customOrigin" label="Custom Origin" type="string">
+					<description>Default origin can be manually overwritten. However, default origin is satisfactory in most cases.</description>
+				</attribute>
+				<attribute visible="true" name="description" label="Description" type="text">
+					<description>User&#39;s mapping description</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="SourceMappingsViewOriginNode" max="1"/>
+			</subNodes>
+			<description>Mapping links the source system entity with the respective MDM canonical model entity</description>
+		</node>
+		<node id="SelectedTablesNode" name="selectedTables" label="Selected Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedTableNode" max="-1"/>
+			</subNodes>
+			<description>List of selected tables (entities) to process with this load operation</description>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>table/@name</selectPath>
+					<message>Duplicate entity name!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="SelectedTableNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="list" required="true">
+					<description>Loaded entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>lower-case(ancestor::system/sourceMappings/mapping[not(@entity = preceding-sibling::mapping/@entity)]/@entity)
+				</selectPath>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@name=$current/ancestor::system/sourceMappings/mapping/@entity]</expression>
+					<message>Load operation uses entity without source mapping!!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="FullLoadNode" inherits="AbstractLoadOperationNode" name="fullLoad" label="Full Load ({@nameSuffix})" explorerLeaf="true">
+			<attributes>
+				<attribute name="allTables" label="Process All Entities from Source Mappings" type="boolean" required="true" defaultValue="true">
+					<description>Check this option to automatically process all entities from the system using this load operation</description>
+				</attribute>
+			</attributes>
+			<editors>
+				
+			</editors>
+			<subNodes>
+				<subNode min="1" id="SelectedTablesNode" max="1"/>
+				<subNode min="1" id="AdvancedTabNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_full.xsl</templatePath>
+				</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allTables=&#39;false&#39;]/selectedTables/table|.[@allTables=&#39;true&#39;]</expression>
+					<message>Load operation has no defined entities!</message>
+				</validation>
+			</validations>
+			<description>Performs a full load of selected entities from the system. Entities not mentioned in the definition will not be imported</description>
+		</node>
+		<node id="DeltaLoadNode" inherits="AbstractLoadOperationNode" name="deltaLoad" label="Delta Load ({@nameSuffix})" explorerLeaf="true">
+			<attributes>
+				<attribute name="allTables" columnWidth="12" label="Process All Entities from Source Mappings" type="boolean" required="true" defaultValue="true">
+					<description>Check this option to automatically process all entities from the system using this load operation</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_delta.xsl</templatePath>
+				</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allTables=&#39;false&#39;]/selectedTables/table|.[@allTables=&#39;true&#39;]</expression>
+					<message>Load operation has no defined entities!</message>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="SelectedTablesNode" max="1"/>
+				<subNode min="1" id="AdvancedTabNode" max="1"/>
+			</subNodes>
+			<description>Performs an incremental load of selected entities from the system</description>
+		</node>
+		<node id="ComplexDeltaLoadNode" inherits="AbstractLoadOperationNode" name="complexDeltaLoad" label="Complex Delta Load ({@nameSuffix})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="DeltaLoadTableSettingsNode" max="1"/>
+				<subNode min="1" id="AdvancedTabComplexNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_complex_delta.xsl</templatePath>
+				</gen>
+			</generators>
+			<attributes>
+				
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>./tableSettings/table</expression>
+					<message>Load operation has no defined entities!</message>
+				</validation>
+			</validations>
+			<description>Performs an incremental load of selected entities from the system. This operation requires additional configuration of entity dependency</description>
+		</node>
+		<node id="DeltaLoadTableSettingsNode" name="tableSettings" label="Entity Settings" expanded="true">
+			<subNodes>
+				<subNode min="0" id="TableSettingsNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>table/@name</selectPath>
+					<message>Duplicate entity name! In case of an entity dependent on more central entities, define it on Advanced tab (Partitioned entities).</message>
+				</validation>`
+	 		</validations>
+			<description>Configuration of processed entities in complex delta load</description>
+		</node>
+		<node id="TableSettingsNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="list" required="true">
+					<description>Entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+						ancestor::system/sourceMappings/mapping[@entity !=preceding-sibling::mapping[1]/@entity or count(preceding-sibling::mapping)=0]
+						</selectPath>
+						<valueTemplate>{@entity}</valueTemplate>
+						<labelTemplate>{@entity}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="mode" label="Delta Dependency Mode" type="list" required="true" defaultValue="autonomous">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::tableSettings/table[@mode=&#39;central&#39;]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>Dependent on {@name}</labelTemplate>
+						<staticValues>
+							<entry value="central" label="Central"/>
+							<entry value="autonomous" label="Autonomous"/>
+						</staticValues>
+					</valuesProvider>
+					<description>Configuration of Entity Dependency Handling in incremental processing. Available settings:
+&lt;ul&gt;
+&lt;li&gt;&lt;kbd&gt;autonomous&lt;/kbd&gt; (default): entity is processed independently from the rest of the entities&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;central&lt;/kbd&gt;: entity is processed in incremental load using the change type. The entity determines change processing for the corresponding Dependent entities&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;dependent on [central_entity]&lt;/kbd&gt;: entity is processed as a full load within the context of the central entity&lt;/li&gt;
+&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="keyColumn" columnWidth="40" label="Key Column (Central and Dependent modes)" type="string">
+					<description>Use primary key column for central or autonomous entities. For dependent entities use foreign key column reference to the central entity (central entity PK)</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/preview/databaseModel/instanceTables/*[@name=lower-case($current/../@name)]/columns/*[(@isFk=&#39;true&#39; or @isPk=&#39;true&#39;) and (@origin=&#39;source&#39; or @origin=&#39;internal&#39;)]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation message="Key Column must be defined for Dependent and Central entities." class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@mode=&quot;autonomous&quot; or @keyColumn !=&#39;&#39;]</expression>
+				</validation>
+				<validation message="Owning entity must be defined for Dependent entities." class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@mode!=&quot;dependent&quot; or @owningTable !=&#39;&#39;]</expression>
+				</validation>
+			</validations>
+		</node>
+		<node id="DirectLoadNode" visibleInParent="true" inherits="AbstractLoadOperationNode" visible="true" name="directLoad" label="Direct Load ({@nameSuffix})" explorerLeaf="true">
+			<attributes>
+				<attribute visible="false" name="allTables" columnWidth="12" label="Process All Entities from Source Mappings" type="boolean" required="true" defaultValue="true">
+					<description>Check this option to automatically process all entities from the system using this load operation</description>
+				</attribute>
+			</attributes>
+			<subNodes><!-- <subNode min="1" id="SelectedTablesNode" max="1"/>--><subNode min="1" id="AdvancedTabNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_delta.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Direct (initial) load operation capable to load non-active records as well (&lt;i&gt;change_type&lt;/i&gt; has to be equal to &#39;D&#39;). Records without change type are loaded as active.</description>
+		</node>
+		<node id="SourceMappingsViewOriginNode" visibleInParent="true" visible="true" generated="true" name="viewOrigin" label="View Default Origin" expanded="true">
+			<attributes>
+				<attribute name="origin" label="Value" type="string">
+					<description>Descriptive name, which provides text information about record origin. It is available as eng_origin attribute in transformation plans.&lt;br/&gt;
+Name pattern: &amp;lt;source_system&amp;gt;_&amp;lt;source_table&amp;gt;#&amp;lt;target_MDM_entity&amp;gt;, e.g. &lt;i&gt;life_contract#party&lt;/i&gt;&lt;br/&gt;
+Note: If you change value of custom origin (or add or delete) you need to reload metadata in order to reflect the change here.</description>
+				</attribute>
+			</attributes>
+			<description>Preview of default origin</description>
+		</node>
+		<node id="IgnoredComparisonColumns" name="ignoredComparisonColumns" newTab="false" label="Ignored Comparison Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="IgnoredComparisonColumn" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>Listed input columns will be ignored during the batch record processing only. This option overrides the global settings for Ignored Comparison Columns in &lt;i&gt;Preferences&lt;/i&gt;&lt;br/&gt;
+Note: &lt;kbd&gt;source_timestamp&lt;/kbd&gt; column is always ignored by default.
+&lt;!-- 100 --&gt;</description>
+		</node>
+		<node id="IgnoredComparisonColumn" visible="true" name="ignoredComparisonColumn" label="{@names}">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="names" label="Column name" type="string" required="true">
+					<description>Ignored attribute name from the canonical model. Wildcard (asterisk) is also supported (eg. src_date*)</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+		lower-case(ancestor::metadata/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::*/selectedTables/table/@name) or @name=lower-case($current/ancestor::*/partitionedEntities/entity/@name) or @name=lower-case($current/ancestor::*/tableSettings/table/@name) or (@name=lower-case($current/ancestor::system/sourceMappings/mapping/@entity) and $current/ancestor::*/@allTables=&#39;true&#39;)]/columns/column
+		[@isFk=&#39;false&#39; and (@origin=&#39;source&#39; or @origin=&#39;SOURCE&#39;) and not(valueDefinition) and not(@name=preceding-sibling::*/@name)]/@name)
+	</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute visible="true" name="allEntities" label="All entities" type="boolean" required="true" defaultValue="false">
+					<description>Ignore this attribute in Delta detection process for all entities</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allEntities = &#39;true&#39;]|.[@allEntities=&#39;false&#39;]/entities/entity </expression>
+					<message>Entities must be defined for ignored comparison columns!</message>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="ICCEntities" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ICCEntities" name="entities" label="Entities" expanded="true">
+			<attributes>
+        
+      </attributes>
+			<subNodes>
+				<subNode min="0" id="ICCEntity" max="-1"/>
+			</subNodes>
+			<description>The difference in comparison of input value in &lt;i&gt;Change detection&lt;/i&gt; process will be ignored for the following list of entities</description>
+		</node>
+		<node id="ICCEntity" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Name of ignored entity</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::*/selectedTables/table[not(@name=preceding-sibling::table/@name) and @name!=ancestor::system/sourceMappings/mapping/@name]/@name|ancestor::system/sourceMappings/mapping[@entity!=preceding-sibling::mapping[1]/@entity or count(preceding-sibling::mapping)=0]/@entity</selectPath>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="AdvancedTabNode" name="advanced" newTab="true" label="Advanced" expanded="true">
+			<subNodes>
+				<subNode min="1" id="IgnoredComparisonColumns" max="1"/>
+				<subNode min="1" id="PathVarsNode" max="1"/>
+				<subNode min="1" id="AdditionalParametersNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="deletionStrategy" label="Source Deletion Strategy" type="enum" required="true" enumValues="use global setting (from Preferences),delete,deactivate" defaultValue="use global setting (from Preferences)">
+					<description>Use this configuration to override the global &lt;i&gt;Source Deletion Strategy&lt;/i&gt; settings from &lt;i&gt;Preferences&lt;/i&gt;.</description>
+				</attribute>
+			</attributes>
+			<description>Settings of advanced behavior such as Source Deletion Strategy (i.e. record activity) and Ignored Comparison Columns (both overwrite global settings)</description>
+		</node>
+		<node id="PartitionedEntities" name="partitionedEntities" label="Partitioned Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="PartitionedEntity" max="-1"/>
+			</subNodes>
+			<description>Similar to Dependent Entity, but different Central Entity and Key Column attributes could be prescribed for each Origin.&lt;br/&gt;
+Note: the Central Entity definition is used from &lt;i&gt;General tab&lt;/i&gt; setting; only Partitioned Dependent Entities are defined here!</description>
+		</node>
+		<node id="PartitionedEntity" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Entity name" type="string" required="true">
+					<description>Name of an entity that is partitioned</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+						ancestor::system/sourceMappings/mapping[@entity !=preceding-sibling::mapping[1]/@entity or count(preceding-sibling::mapping)=0]
+						</selectPath>
+						<valueTemplate>{lower-case(@entity)}</valueTemplate>
+						<labelTemplate>{lower-case(@entity)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="mode" label="Dependency Settings" type="list" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::complexDeltaLoad/tableSettings/table[@mode=&#39;central&#39;]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>Dependent on {@name}</labelTemplate>
+					</valuesProvider>
+					<description>Configuration of Entity Dependency Handling in incremental processing if an entity is dependent on two or more Central Entities. &lt;br/&gt;
+&lt;kbd&gt;Dependent on [central_entity]&lt;/kbd&gt;: entity is processed as a full load within the context of the central entities (i.e. Delta Detection process is evaluated per each Central Entity separately).</description>
+				</attribute>
+				<attribute name="keyColumn" label="Key Column" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/preview/databaseModel/instanceTables/*[@name=lower-case($current/../@name)]/columns/*[@isFk=&#39;true&#39; and (@origin=&#39;source&#39; or @origin=&#39;internal&#39;)]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Foreign key column referencing to the particular central entity (central entity PK)</description>
+				</attribute>
+				<attribute name="origin" label="Origin" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>
+						ancestor::system/sourceMappings/mapping[@entity = $current/../@name]/@customOrigin|
+						ancestor::system/sourceMappings/mapping[@entity = $current/../@name]/viewOrigin/@origin
+			
+						</selectPath>
+					</valuesProvider>
+					<description>Origin identifies data source of dependent entity uniquely.</description>
+				</attribute>
+			</attributes>
+			<description>Delta Dependency setting for a Partitioned Entity.
+</description>
+		</node>
+		<node id="AdvancedTabComplexNode" name="advanced" newTab="true" label="Advanced" expanded="true">
+			<subNodes>
+				<subNode min="1" id="PartitionedEntities" max="1"/>
+				<subNode min="1" id="IgnoredComparisonColumns" max="1"/>
+				<subNode min="1" id="PathVarsNode" max="1"/>
+				<subNode min="1" id="AdditionalParametersNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="deletionStrategy" label="Source Deletion Strategy" type="enum" required="true" enumValues="use global setting (from Preferences),delete,deactivate" defaultValue="use global setting (from Preferences)">
+					<description>Use this configuration to override the global &lt;i&gt;Source Deletion Strategy&lt;/i&gt; settings from &lt;i&gt;Preferences&lt;/i&gt;.</description>
+				</attribute>
+			</attributes>
+			<description>Setting of advanced behavior such as Source Deletion Strategy (i.e. record activity), Ignored Comparison Columns (both override global settings) and advanced setting of Delta Dependency Mode for Partitioned Entity.</description>
+		</node>
+		<node id="InitialLoadNode" inherits="AbstractLoadOperationNode" name="initialLoad" label="Initial Load ({@nameSuffix})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="AdvancedTabInitialNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="allowLoad" label="Use Full Load Plan" type="boolean" required="true" defaultValue="true">
+					<description>Use previously created Full Load component in the Initial Load operation without the need to configure the same mapping again. If set to &lt;i&gt;false&lt;/i&gt;, the mapping can be created as needed - it can be different from the full load.
+&lt;!-- 1000 --&gt; </description>
+				</attribute>
+				<attribute name="ignorePersistence" label="Ignore Persistence" type="enum" enumValues="true,false">
+					<description>The processing is optimized automatically, i.e. this option is usually not required.&lt;br/&gt;
+&lt;br/&gt;
+Optimization means that engine does not read any records from MDC storage. The setting is used automatically if there are no instance records in MDC storage. If there are instance records (obviously from other source system), this optimization is not used.&lt;br/&gt;
+The automatic decision can be overriden by setting this attribute to &lt;kbd&gt;true&lt;/kbd&gt;. &lt;b&gt;This is expert setting&lt;/b&gt; - there is no need to override to false in case of empty persistence and overriding to true might lead to wrongly computed data. 
+Imagine there is already one source system loaded and Initial Load is used to load new one - new records won&#39;t be joined (CopyColumns) nor matched (Match) with the first source system!
+&lt;!-- 1000 --&gt; </description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{ancestor::system/@name}_{@nameSuffix}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_initial.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Initial load operation is designed to perform a first time load of all entities from a Connected System. The only prerequisite is that there must be no records of that system in MDC storage.&lt;br/&gt;
+Moreover, there are some performance optimization available such as: 
+&lt;ul&gt;&lt;li&gt;skips Change Detection (always)&lt;/li&gt;
+&lt;li&gt;the engine detects whether any records are required from MDC storage&lt;/li&gt;&lt;/ul&gt;
+It is also possible to load inactive records as well (&lt;i&gt;change_type&lt;/i&gt; has to be equal to &#39;D&#39;). Records without change type are loaded as active.&lt;br/&gt;
+For more details, see the reference documentation.
+&lt;!-- 1000 --&gt; </description>
+		</node>
+		<node id="PathVarsNode" visibleInParent="true" visible="true" name="pathVariables" label="Path Variables" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ParthVarNode" max="-1"/>
+			</subNodes>
+			<description>List of PathVariables specified for the load operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="ParthVarNode" visibleInParent="true" visible="true" name="pathVariable" label="Path Variable">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>PathVariable name that is referenced in an input step, e.g. BATCH_IN</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>PathVariable value, e.g. ${PATH|XXXXINSTALL_DIRXXX/cdi_hub/data/ext}</description>
+				</attribute>
+			</attributes>
+			<description>Definition of PathVariable for the load operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="AdditionalParametersNode" visibleInParent="true" name="additionalParameters" label="Additional Parameters" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AdditionalParameterNode" max="-1"/>
+			</subNodes>
+			<description>Additional Parameters&#39; definition for the export operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="AdditionalParameterNode" visibleInParent="true" name="additionalParameter" label="Additional Parameter" expanded="false">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Parameter name</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>Parameter value</description>
+				</attribute>
+			</attributes>
+			<description>Addition Parameter definition
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="AdvancedTabInitialNode" name="advanced" newTab="true" label="Advanced" expanded="true">
+			<subNodes>
+				<subNode min="1" id="PathVarsNode" max="1"/>
+				<subNode min="1" id="AdditionalParametersNode" max="1"/>
+			</subNodes>
+		</node>
+	</nodes>
+</metametadata-library>

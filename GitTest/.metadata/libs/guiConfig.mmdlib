@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library xmlns:fn="http://www.w3.org/2005/xpath-functions">
+	<nodes>
+		<node id="GuiConfig" icon="icons/windows.png" sortChildren="false" name="guiConfig" label="GUI Configuration" explorerLeaf="false">
+			<subNodes>
+				<subNode min="1" id="GuiHierarchies" max="1"/>
+				<subNode min="1" id="GuiActions" max="1"/>
+				<subNode min="1" id="GuiIndicators" max="1"/>
+				<subNode min="1" id="GuiBatchOperation" max="1"/>
+				<subNode min="1" id="GuiVisualizationConstants" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Load Plan" fileNameTemplate="Files/engine/load/{@guiSystem}_full.comp"/>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<attributes>
+				<attribute name="enableGui" label="Enable GUI" type="boolean" required="true" defaultValue="false">
+					<description>Show data from this layer in the GUI
+</description>
+				</attribute>
+				<attribute name="guiMode" label="GUI Mode" type="enum" required="true" enumValues="Read-Write,Read-Only" defaultValue="Read-Only">
+					<description>GUI mode setup. When it is set to &lt;i&gt;Read-Write&lt;/i&gt; mode, a data stweard is able to edit or create new records in the MDM Hub storage
+</description>
+				</attribute>
+				<attribute name="guiSystem" label="GUI System Name" type="string" required="true" defaultValue="mda">
+					<description>Name of the connected system that is used for record creation/editing/deactivation using the GUI.
+</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@guiSystem</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>System name {@name} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation><!--
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+           			<expression>.[enableGui=&#39;true&#39; and guiReadOnly=&#39;false&#39; and guiSystem=&#39;&#39; ]</expression>
+           			<message>System name {@name} has to be specified when Read/Write GUI mode enabled!</message>
+       			</validation>
+       			
+       			<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>..[count(masterModel[@enableGui=&#39;true&#39;])=1]|..[count(masterModel[@enableGui=&#39;true&#39;])=0]</expression>
+					<message>Only one master layer can be used for GUI</message>
+				</validation>
+				--><validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>/logicalModel/masterModels/masterModel/guiConfig[@guiMode=&#39;Read-Write&#39; and @enableGui=&#39;true&#39; and /settings/advancedSettings/@matchingCompatibility=&#39;true&#39;]</expression>
+					<message>If GUI RW mode is enabled, Matching Compatibility Mode should not be used!</message>
+				</validation>
+			</validations>
+			<description>Allows to confugure the GUI, i.e. visibility of actions, hierarchies and batch load operations.
+&lt;!-- 10000 and below--&gt;</description>
+		</node>
+		<node id="GuiHierarchies" sortChildren="false" name="hierarchies" newTab="true" label="Hierarchies" explorerLeaf="false" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiHierarchy" max="-1"/>
+			</subNodes><!--<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+           			<expression>table[count(ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData=$current/@name)>0 and (@instUse!='none' or @loadInst='true')]
+           			|table[count(ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData=$current/@name)=0]
+					</expression>
+           			<message>Dictionary is mapped to instance column! Either choose instance use different from "None" or enable Instance Load.</message>
+       			</validation>
+       		</validations>--><description>Definition of the hierarchy data view, e.g. relationships and related entities, enpoints positioning labeles, line type and color.</description>
+		</node>
+		<node id="GuiHierarchy" abstract="true" name="hierarchy" label="{@label}" explorerLeaf="false" expanded="false">
+			<attributes>
+				<attribute name="label" label="GUI Label" type="string" required="true">
+					<description>Hierarchy view name</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+		
+       			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+			
+				
+				
+			
+				
+				
+			
+				
+				
+			
+				
+				
+			
+				
+				
+			
+				
+				
+			
+				
+				
+			
+			</subNodes>
+			<editors>
+				<editor showTree="false" openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Hierarchy Definition"/>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>Reference data table name {@name} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+			<description>Hierarchy view definition</description>
+		</node>
+		<node id="GuiActions" sortChildren="false" name="actions" label="Action Buttons" expanded="true">
+			<attributes>
+				<attribute name="manualExceptions" label="Manual Exceptions" type="boolean" required="true" defaultValue="true">
+					<description>Allows to show/hide &lt;i&gt;split-isolate&lt;/i&gt; and &lt;i&gt;merge&lt;/i&gt; actions icons visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+				<attribute name="hierarchies" label="Hierarchies" type="boolean" required="true" defaultValue="true">
+					<description>Allows to show/hide action icon visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+				<attribute name="create" label="Create" type="boolean" required="true" defaultValue="false">
+					<description>Allows to show/hide action icon visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+				<attribute name="edit" label="Edit" type="boolean" required="true" defaultValue="false">
+					<description>Allows to show/hide action icon visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+				<attribute name="deactivate" label="Deactivate" type="boolean" required="true" defaultValue="false">
+					<description>Allows to show/hide action icon visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+				<attribute name="revert" label="Revert changes" type="boolean" required="true" defaultValue="false">
+					<description>Allows to show/hide action icon visible in the GUI regardless the persmissions assigned.</description>
+				</attribute>
+			</attributes>
+			<description>Allows to show/hide liested actions icons visiblity in the GUI regardless the persmissions assigned.</description>
+		</node>
+		<node id="GuiHierarchyMN" inherits="GuiHierarchy" name="hierarchyMN" label="MN Hierarchy ({@label})">
+			<attributes>
+				<attribute name="tableMN" label="Asociative Table Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>              
+						/logicalModel/masterModels/masterModel[@name=$current/ancestor::masterModel/@name]/masterTables/masterTable | /logicalModel/masterModels/masterModel[@name=$current/ancestor::masterModel/@name]/instanceTables/instanceTable
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+					</valuesProvider>
+					<description>Select name of associative table representing MN relationship</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="StartPoint" max="1"/>
+				<subNode min="1" id="EndPoint" max="1"/>
+				<subNode min="1" id="HierarchyConfig" max="1"/>
+				<subNode min="1" id="GuiHierarchyDisplaySettingsNode" max="1"/>
+			</subNodes>
+			<description>Many to manty (MN) type of hierarchy setting</description>
+		</node>
+		<node id="GuiHierarchy1N" abstract="false" inherits="GuiHierarchy" name="hierarchy1N" label="1:N Hierarchy ({@label})">
+			<attributes>
+				<attribute name="relationship" label="Select Relationship" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>
+						ancestor::masterModel/relationships/relationship[advanced/@ignoreRelGui=&#39;false&#39;]
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@label} ({@name})</labelTemplate>
+					</valuesProvider>
+					<description>Select name of the relationship used for hierarchy browsing</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="StartPoint" max="1"/>
+				<subNode min="1" id="EndPoint" max="1"/>
+				<subNode min="1" id="HierarchyConfig" max="1"/>
+			</subNodes>
+			<description>One to manty (1:N) type of hierarchy setting</description>
+		</node>
+		<node id="HierarchyConfig" name="connection" label="Connection Settings" expanded="true">
+			<attributes>
+				<attribute name="connectionColour" label="Connection Color" type="string" required="true" defaultValue="#BABABA">
+					<description>Relationship color. Any standard-CSS color enabled, e.g. keyword: red, blue; hexadecimal: #FFFF00; rgb(255,255,0); transparent: rgba(255,255,0,1), &quot;transparent&quot; etc.</description>
+				</attribute>
+				<attribute visible="true" name="connectionShape" label="Connection Shape" type="enum" required="true" enumValues="Bezier,StateMachine,Flowchart,Straight" defaultValue="Bezier">
+					<description>Relationship shape</description>
+				</attribute>
+				<attribute visible="false" name="connectionLabel" label="Connection Label" type="expression">
+					<expressionProvider class="com.ataccama.ame.core.expressions.SemiExpressionPathValuesProvider">
+						<sources>
+							<source name="preview">
+								<selectPath>
+/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::masterModel/instanceTables/instanceTable[@name=$current/ancestor::labeledRelatedMNList/@entity_out]/@instanceTable)]/columns/column
+|/preview/databaseModel/masterTables/physicalTable[@name=lower-case($current/ancestor::masterModel/masterTables/masterTable[@name=$current/ancestor::labeledRelatedMNList/@entity_out]/@instanceTable)]/columns/column							
+							</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{@schema}.{@name}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+					<description>Relationship label to be shown in hiearchy view
+&lt;!-- expression provider is not working for now --&gt;</description>
+				</attribute>
+			</attributes>
+			<description>Setting of relationship display settings.</description>
+		</node>
+		<node id="GuiBatchOperation" visibleInParent="true" sortChildren="false" visible="true" name="batchOperations" newTab="true" label="Batch Operations" expanded="true">
+			<attributes>
+				<attribute name="guiInitialLoad" label="Enable Initial Load Operation" type="boolean" required="true" defaultValue="false">
+					<description>Allows to add initial full load operation to load already existing data under the connected system that is used by the GUI.&lt;br/&gt;
+Please note, the load plan is shared with Full Load Operation</description>
+				</attribute>
+				<attribute name="guiFullLoad" label="Enable Full Load Operation" type="boolean" required="true" defaultValue="false">
+					<description>Allows to add full load operation to load already existing data under the connected system that is used by the GUI.</description>
+				</attribute>
+				<attribute name="guiLoadAllEntities" label="Load All Entities Available" type="boolean" required="true" defaultValue="true">
+					<description>Allows to load data for all entities that are marked as editable in the GUI.</description>
+				</attribute>
+			</attributes>
+			<subNodes><!--	<subNode min="1" id="loadOp.LoadOperationsNode" max="1"/> --><subNode min="1" id="GuiBatchOperationEntities" max="1"/>
+				<subNode min="1" id="ViewOriginsNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[(@guiFullLoad=&#39;true&#39; or @guiInitialLoad=&#39;true&#39;) and ../@guiMode=&#39;Read-Only&#39;]</expression>
+					<message>GUI is not in RW mode!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@guiLoadAllEntities=&#39;true&#39; and loadedEntities/loadedEntity]</expression>
+					<message>Option Load All Entities Available is used!</message>
+				</validation>
+			</validations>
+			<generators>
+				<gen source=".[ancestor::guiConfig[@enableGui=&#39;true&#39; and batchOperations/@guiFullLoad=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{../@guiSystem}_full.comp</fileNameTemplate>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="/preview/databaseModel/masterTables" name="masterTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="ancestor::masterModel" name="masterModel"/>
+						<param source="ancestor::guiConfig" name="guiConfig"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_load_gui.xsl</templatePath>
+				</gen>
+				<gen source=".[ancestor::guiConfig[@enableGui=&#39;true&#39; and batchOperations/@guiInitialLoad=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/load/{../@guiSystem}_initial.comp</fileNameTemplate>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="/preview/databaseModel/masterTables" name="masterTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="ancestor::masterModel" name="masterModel"/>
+						<param source="ancestor::guiConfig" name="guiConfig"/>
+					</parameters>
+					<templatePath>xslt/gen_load_gui.xsl</templatePath>
+				</gen>
+			</generators>
+		</node>
+		<node id="GuiBatchOperationEntities" name="loadedEntities" label="Loaded Entites for Full Load" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiBatchOperationEntity" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiBatchOperationEntity" name="loadedEntity" label="Loaded Entity" expanded="true">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/masterModels/masterModel[@name=$current/ancestor::masterModel/@name and guiConfig/@guiMode=&#39;Read-Write&#39;]/masterTables/masterTable[guiEdit/@guiReadOnly=&#39;use global setting (from GUI Configuration)&#39;] 
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+					</valuesProvider>
+					<description>Entity selected for GUI initial/full batch load operation</description>
+				</attribute>
+				<attribute visible="false" name="customOrigin" label="Custom Origin" type="string">
+					<description>Default origin can be manually overwritten. However, default origin is satisfactory in most cases.</description>
+				</attribute>
+				<attribute visible="false" name="description" label="Description" type="text">
+					<description>User&#39;s mapping description</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="ViewOriginsNode" visibleInParent="false" visible="false" generated="true" name="viewOrigins" label="View Default Origins" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ViewOriginNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ViewOriginNode" visibleInParent="true" visible="true" generated="true" name="viewOrigin" label="View Default Origin" expanded="true">
+			<attributes>
+				<attribute name="entity" label="Entity" type="string"/>
+				<attribute name="origin" label="Value" type="string">
+					<description>Descriptive name, which provides text information about record origin. It is available as eng_origin attribute in transformation plans.&lt;br/&gt;
+Name pattern: &amp;lt;source_system&amp;gt;_&amp;lt;source_table&amp;gt;#&amp;lt;target_MDM_entity&amp;gt;, e.g. &lt;i&gt;life_contract#party&lt;/i&gt;&lt;br/&gt;
+Note: If you change value of custom origin (or add or delete) you need to reload metadata in order to reflect the change here.</description>
+				</attribute>
+			</attributes>
+			<description>Preview of default origin</description>
+		</node><!-- FROM SYSTEM NODE --><node id="GuiIndicators" sortChildren="false" name="indicators" label="Indicators" expanded="true">
+			<attributes>
+				<attribute name="dqi" label="DQ Indicators" type="boolean" required="true" defaultValue="true">
+					<description>Allows to show/hide DQ Indicator icons(s) visible in the GUI.</description>
+				</attribute>
+			</attributes>
+			<description>Allows to show/hide some addtional features visible in the GUI.</description>
+		</node>
+		<node id="StartPoint" name="startPoint" label="Start Point" expanded="true">
+			<attributes>
+				<attribute name="label" label="Label" type="string">
+					<description>Endpoint label</description>
+				</attribute>
+				<attribute name="position" label="Position" type="string">
+					<description>Endpoint position definition. There are multiple ways, how to define the position of an endpoint:&lt;br/&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;kbd&gt;absolute positions&lt;/kbd&gt;: Bottom, BottomLeft, BottomRight, Center, Left, Right, Top, TopLeft, TopRight &lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;relative positioning&lt;/kbd&gt;: Assign, AutoDefault, Continuous, ContinuousBottom, ContinuousLeft, ContinuousRight, ContinuousTop, Perimeter&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;simple coordinates&lt;/kbd&gt;: &quot;x, y&quot;, where x and y are coordinates in the interval [0,1] specifying the relative position of the endpoint such that [0, 0] is top left corner, [1, 1] is right bottom corner, x is horizontal and y vertical position.&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;coordinates&lt;/kbd&gt;: &quot;x, y, dx, dy&quot;, where (dx, dy) is vector specifying the orientation of the curve incident to the endpoint. +dx right, -dx left, +dy down, -dy up.&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;advanced coordinates&lt;/kbd&gt;: &quot;x, y, dx, dy, offx, offy&quot;, where offx and offy are the offset of the endpoint in pixels.&lt;/li&gt;
+&lt;/ul&gt;</description>
+				</attribute>
+			</attributes>
+			<description>Start endpoint definition</description>
+		</node>
+		<node id="EndPoint" name="endPoint" label="End Point" expanded="true">
+			<attributes>
+				<attribute name="label" type="string">
+					<description>Endpoint label</description>
+				</attribute>
+				<attribute name="position" type="string">
+					<description>Endpoint position definition. There are multiple ways, how to define the position of an endpoint:&lt;br/&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;kbd&gt;absolute positions&lt;/kbd&gt;: Bottom, BottomLeft, BottomRight, Center, Left, Right, Top, TopLeft, TopRight &lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;relative positioning&lt;/kbd&gt;: Assign, AutoDefault, Continuous, ContinuousBottom, ContinuousLeft, ContinuousRight, ContinuousTop, Perimeter&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;simple coordinates&lt;/kbd&gt;: &quot;x, y&quot;, where x and y are coordinates in the interval [0,1] specifying the relative position of the endpoint such that [0, 0] is top left corner, [1, 1] is right bottom corner, x is horizontal and y vertical position.&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;coordinates&lt;/kbd&gt;: &quot;x, y, dx, dy&quot;, where (dx, dy) is vector specifying the orientation of the curve incident to the endpoint. +dx right, -dx left, +dy down, -dy up.&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;advanced coordinates&lt;/kbd&gt;: &quot;x, y, dx, dy, offx, offy&quot;, where offx and offy are the offset of the endpoint in pixels.&lt;/li&gt;
+&lt;/ul&gt;</description>
+				</attribute>
+			</attributes>
+			<description>End endpoint definition</description>
+		</node>
+		<node id="GuiHierarchyDisplaySettingsNode" name="hierarchyDisplaySettings" label="Display Settings" expanded="true">
+			<attributes>
+				<attribute name="relationshipLabel" label="Connector Label" type="expression">
+					<expressionProvider class="com.ataccama.ame.core.expressions.SemiExpressionPathValuesProvider">
+						<sources>
+							<source name="preview">
+								<selectPath>/preview/databaseModel/masterTables/physicalTable[@name=lower-case($current/ancestor::hierarchyMN/@tableMN) and @layerName = lower-case($current/ancestor::masterModel/@name)]/columns/column[not(@name=preceding-sibling::column/@name)]
+                 			| /preview/databaseModel/instanceTables/physicalTable[@layerName = &#39;instance&#39; and @name = lower-case($current/ancestor::logicalModel/masterModels/masterModel[@name=$current/ancestor::masterModel/@name]/instanceTables/instanceTable[@name=$current/ancestor::hierarchyMN/@tableMN]/@instanceTable)]/columns/column[not(@name=preceding-sibling::column/@name)]
+							 </selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{@schema}.{@name}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+					<description>Relationship label to be shown in a hiearchy view&lt;br/&gt;
+Note: always used the ${cmo_type} convention, otherwise attribute name will be displayed.</description>
+				</attribute>
+			</attributes>
+			<description>Definition of information to be display in the GUI when the hierarchy visualization of MN relations (associative table)</description>
+		</node>
+		<node id="GuiVisualizationConstants" visibleInParent="false" visible="false" generated="true" name="guiConstants" label="Gui Constants">
+			<subNodes>
+				<subNode min="1" id="GuiLookupConstants" max="1"/>
+				<subNode min="1" id="GuiAttributeFormats" max="1"/>
+			</subNodes>
+		</node>
+		<node id="GuiLookupConstants" generated="true" name="guiLookups">
+			<subNodes>
+				<subNode min="0" id="GuiLookupConstant" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiAttributeFormats" generated="true" name="guiAttributeFormats">
+			<subNodes>
+				<subNode min="0" id="GuiAttributeFormat" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiLookupConstant" generated="true" name="guiLookup">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="label" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiAttributeFormat" generated="true" name="guiAttributeFormat">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="label" type="string"/>
+				<attribute name="dqcType" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

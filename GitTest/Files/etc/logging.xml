@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<loggingConfig>
+	<appenders>
+		<iLogAppenderFactory name="mdm-server" fileName="../storage/server.log" encoding="utf-8" class="com.ataccama.dqc.commons.logging.factories.FileLogAppenderFactory" mode="append"/>
+		<iLogAppenderFactory useStdErr="false" name="standard-out" class="com.ataccama.dqc.commons.logging.factories.StdOutLogAppenderFactory"/>
+	</appenders>
+	<loggingRules>
+		<loggingRule level="INFO" appender="mdm-server">
+			<trace/>
+		</loggingRule>
+		<loggingRule level="INFO" appender="standard-out">
+			<trace/>
+		</loggingRule>
+	</loggingRules>
+</loggingConfig>

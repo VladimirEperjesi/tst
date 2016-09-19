@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<signingInfo>
+   <signedFiles>
+      <file name="meta.mmd" signature="QvXqmKeb+ra7mJkjSNa8ne4LWsvUvmJeE4UioYfGOy7S4rjgE12rRFuYEXiNjBdlDhYoJaGIvPcaLAsfmcoHRg=="></file>
+      <file name="manifest.xml" signature="TSLbOQLyaYxJTpaBAVE8cfvwpHr2FwQKr1m8Ru8fxwYBKI2jSjJHZZpLjWBENECeQ+uor0rShsdlDRQ7pAaMzg=="></file>
+      <file name="libs/systemsPreview.mmdlib" signature="giwbf7mTYLc3L25SIBPQaoY/dwAok2ZdGBtWJmaXpxWgyCzJu2jgRCt+HFogRIhXeSawToLop6k/YrQrD1b/zw=="></file>
+      <file name="libs/systems.mmdlib" signature="Wi1wP/NHr6Is3sd8kwxBCqHo+PzZt40MpXFsTZhyunT93OiT/SR8rm0vUMTi55a490q7Bbm7GBiEtf+bRMM7Ig=="></file>
+      <file name="libs/settings.mmdlib" signature="oK4ODE5I7twoiAep7F4ZIWyXt4l+nAM/XOuWKmq/bT59H4zkGbP5z7Gtivb5qcfRjjKxP3MPRMUaaA/nKpOEZQ=="></file>
+      <file name="libs/plans.mmdlib" signature="pZ2kl15GdImRReCm+500WPP3+qBXxwxkRs7ugkuQIsT3j31NQFjr6TwJhOIPZFAVXKkCE/jSVU8yeZGGxLiL0w=="></file>
+      <file name="libs/nativeServices.mmdlib" signature="lPUdyhCaMCz96WtWpFw+K7w5fe1lV9GCZ7LkBXuVDedxciHIlnOl+nUISj1Ft2GQdFVHsS24w/1tvD1W3tNKBg=="></file>
+      <file name="libs/migration.mmdlib" signature="kaf9x5w3ThyYTFsLdeUee1MBAeBw4Zn0XsUMMBt2+5N8uU3MtDeWwRp8whEFE+ZDh1OAF49P/tcxXQDW67SHLw=="></file>
+      <file name="libs/manualMatch.mmdlib" signature="nXPQFLh45n26inbiRJSC+KhhXEI1Pc4Sdqwi84sC+Pcq0iZyn/l1ix3Z6FCMzMmylaBvNCpeFsdO0Ow4aE7aeA=="></file>
+      <file name="libs/logical.mmdlib" signature="SVX/VSqZkXByEdX2DzVtAFrMPrtvqmuVXzjOYFM447ROaVFECAdsLzMqHwtx5c6ct9qx8Drldj12AFyP8yFYPw=="></file>
+      <file name="libs/inputModel.mmdlib" signature="O+s6Y17ZdHZH10MpJvHBK8o5cvceHQnzhDDDz5hgfgEKbIqNitMTvMfSLdlQli+kRLptP4/DMOtAWdlWUDtNqw=="></file>
+      <file name="libs/history.mmdlib" signature="pq/NdMB+omsxp29314s6yIHr43T/G/YwuqpwVAGzfMScIax20m1K6ZR/BH1+7i2BleBkQBMPPoLBq/r9reYPOw=="></file>
+      <file name="libs/guiPreview.mmdlib" signature="kFMriitjDN36jcaNNTa3obD0R3qlThNo0lzJOY88ciZDVeO+wzhjDUxCvBCb1HFjdF/RGSlC7vZnEp211jMKIQ=="></file>
+      <file name="libs/guiConfig.mmdlib" signature="mM35+sx1rJO0bOnWNhtUWe25AqRpSB1q0gD/VI+K9UYGGQlj/F1roQPBWvdXDWskjkI7YsjlyirBVD686Tog6g=="></file>
+      <file name="libs/export.mmdlib" signature="SFdECxt9ehQeOKYEr5ijrA5F1sXpeFMC3f+57pz3iCjxO/AI1m7A7QHWDdkgljLuVFWUl+9v29hzeSUPA3650w=="></file>
+      <file name="libs/event_handler.mmdlib" signature="n6UuDfu4aigbcO18Ol5JiK5shQGNPf4yOCS+875sQ/0xKGgLPauKwKEihEcCR8fr4Qep6vxz2qMfIcNVN689Vw=="></file>
+      <file name="libs/documentation.mmdlib" signature="pPcedLVVklO5k/ql9K5v81KcxFLE5OsIfLgMb/LTFZKImFwwifiBd1n/agt31txu8+ZJ13/rmkuZgz5RjYakaw=="></file>
+      <file name="libs/dictionaries.mmdlib" signature="doOHQXq9WlAC03lk/k9/xks4R+vfnlRDq0ERN6/eWEuAzQoq47MMV3Zum9aPjSZpF62YaErFSbPcGXQsolnM4g=="></file>
+      <file name="libs/database.mmdlib" signature="IKOspBaSMFmjB0DhoeRXAmlRZ1IuThkvtySNgxP3lT7GstcBiJlkSgxUoQDL/222xpdRPj2sEmdQ1qQBQoglmA=="></file>
+      <file name="libs/advanced_settings.mmdlib" signature="H7w/ly9hI8WqjwDakar8PJi+c61HFbyJNZjB4Vr2avo2aFQfEJpSmqDV1hrnjxHdVMh/F7/wlX90Ab6ip9MubQ=="></file>
+   </signedFiles>
+</signingInfo>

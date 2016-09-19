@@ -1,0 +1,415 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata startPath="/logicalModel/entities" rootNode="MetadataNode">
+	<imports>
+		<import file="libs/settings.mmdlib" prefix="settings"/>
+		<import file="libs/logical.mmdlib" prefix="logical"/>
+		<import file="libs/systems.mmdlib" prefix="systems"/>
+		<import file="libs/database.mmdlib" prefix="database"/>
+		<import file="libs/plans.mmdlib" prefix="plans"/>
+		<import file="libs/export.mmdlib" prefix="export"/>
+		<import file="libs/guiPreview.mmdlib" prefix="gui"/>
+		<import file="libs/documentation.mmdlib" prefix="doc"/>
+		<import file="libs/advanced_settings.mmdlib" prefix="advanced"/>
+		<import file="libs/event_handler.mmdlib" prefix="eh"/>
+		<import file="libs/inputModel.mmdlib" prefix="inputModel"/>
+		<import file="libs/dictionaries.mmdlib" prefix="dic"/>
+		<import file="libs/systemsPreview.mmdlib" prefix="sys"/>
+		<import file="libs/nativeServices.mmdlib" prefix="services"/>
+	</imports>
+	<nodes><!--  overall structure --><node id="MetadataNode" name="metadata" label="Metadata">
+			<subNodes>
+				<subNode min="1" id="settings.GlobalSettingsNode" max="1"/>
+				<subNode min="1" id="systems.SystemsNode" max="1"/>
+				<subNode min="1" id="logical.LogicalNode" max="1"/>
+				<subNode min="1" id="OutputOperationsNode" max="1"/>
+				<subNode min="1" id="services.NativeServiceNode" max="1"/>
+				<subNode min="1" id="plans.TransformationsNode" max="1"/>
+				<subNode min="1" id="PreviewNode" max="1"/>
+				<subNode min="1" id="doc.documentationRoot" max="1"/>
+				<subNode min="1" id="advanced.AdvancedSettingsNode" max="1"/>
+				<subNode min="1" id="dataSourcesRoot" max="1"/>
+				<subNode min="1" id="serversRoot" max="1"/>
+			</subNodes>
+			<generators>
+				<gen showDialog="false" class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			</gen>
+			</generators>
+		</node>
+		<node id="PreviewNode" abstract="false" icon="icons/preview.png" name="preview" label="Preview">
+			<subNodes>
+				<subNode min="1" id="inputModel.InputModelNode" max="1"/>
+				<subNode min="1" id="database.DatabaseModelNode" max="1"/>
+				<subNode min="1" id="gui.GuiPreviewNode" max="1"/>
+				<subNode min="1" id="sys.SystemsPrevNode" max="1"/>
+			</subNodes>
+			<description>Shows a different perspectives of the Logical Model definition such as Canonical Model, Physical Model and GUI Labels. Editing is not supported, use this node only for browsing.</description>
+		</node>
+		<node id="OutputOperationsNode" icon="icons/export1.png" name="outputOperations" label="Output Interfaces">
+			<subNodes>
+				<subNode min="1" id="export.ExportNode" max="1"/>
+				<subNode min="1" id="eh.EventHandlerSettingsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Allows to configure on demand batch exports from the MDM Hub (exports are fully served by the NME Engine) and processing based data changes handled via Event Handler and Publisher.</description>
+		</node>
+		<node id="dataSourcesRoot" sortChildren="false" visible="false" generated="true" name="dataSources">
+			<subNodes>
+				<subNode min="0" id="dataSourcesNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="dataSourcesNode" sortChildren="false" visible="false" generated="true" name="dataSource" label="{@name}">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="driverClass" type="string"/>
+				<attribute name="url" type="string"/>
+				<attribute name="user" type="string"/>
+				<attribute name="password" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="jarFilesWrapper" max="1"/>
+			</subNodes>
+		</node>
+		<node id="jarFilesWrapper" sortChildren="false" visible="false" generated="true" name="jarFiles" label="jar files" expanded="true">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<subNodes>
+				<subNode min="0" id="jarFilesNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="jarFilesNode" sortChildren="false" visible="false" generated="true" name="jarFile" label="jar file">
+			<attributes>
+				<attribute name="file" type="string"/>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="serversRoot" sortChildren="false" visible="false" generated="true" name="servers">
+			<subNodes>
+				<subNode min="0" id="serverNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="serverNode" abstract="true" sortChildren="false" visible="false" generated="true" name="server">
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			
+			
+			
+			</subNodes>
+		</node>
+		<node id="jmsServerNode" inherits="serverNode" sortChildren="false" visible="false" generated="true" name="jmsServer" label="{@name}">
+			<attributes>
+				<attribute name="connectionFactory" type="string"/>
+				<attribute name="user" type="string"/>
+				<attribute name="password" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="serverPropertiesNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="genericServerNode" inherits="serverNode" sortChildren="false" visible="false" generated="true" name="genericServer" label="{@name}">
+			<attributes>
+				<attribute name="url" type="string"/>
+				<attribute name="user" type="string"/>
+				<attribute name="password" type="string"/>
+			</attributes>
+		</node>
+		<node id="serverPropertiesNode" sortChildren="false" visible="false" generated="true" name="properties">
+			<subNodes>
+				<subNode min="0" id="serverPropertyNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="serverPropertyNode" sortChildren="false" visible="false" generated="true" name="property">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="value" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+	<fragments>
+		<fragment selectPath="/settings" fileNameTemplate="md/settings.md"/>
+		<fragment selectPath="/systems/system" fileNameTemplate="md/connected_systems/system_{@name}.md"/>
+		<fragment selectPath="/logicalModel/instanceModel" fileNameTemplate="md/logical_model/instance_model.md"/>
+		<fragment selectPath="/logicalModel/masterModels/masterModel" fileNameTemplate="md/logical_model/master_Model_{@name}.md"/>
+		<fragment selectPath="/logicalModel/dictionary" fileNameTemplate="md/logical_model/reference_data_model.md"/>
+		<fragment selectPath="/outputOperations/exportModel" fileNameTemplate="md/output_interfaces/export_operations.md"/>
+		<fragment selectPath="/outputOperations/eventHandler" fileNameTemplate="md/output_interfaces/event_handler.md"/>
+		<fragment selectPath="/outputOperations/metaColumns" fileNameTemplate="md/output_interfaces/metaColumns.md"/>
+		<fragment selectPath="/advancedSettings/taskInfoExport" fileNameTemplate="md/advanced_settings/taskInfoExport.md"/>
+		<fragment selectPath="/advancedSettings/reprocessSettings" fileNameTemplate="md/advanced_settings/reprocessSettings.md"/>
+		<fragment selectPath="/advancedSettings/historyPlugin" fileNameTemplate="md/advanced_settings/historyPlugin.md"/>
+		<fragment selectPath="/advancedSettings/migration" fileNameTemplate="md/advanced_settings/migration.md"/>
+		<fragment selectPath="/advancedSettings/manualMatch" fileNameTemplate="md/advanced_settings/manualMatch.md"/>
+		<fragment selectPath="/nativeServices" fileNameTemplate="md/services.md"/>
+	</fragments><!-- ************************  Generator parameters **************************************** --><generatorParameters>
+	</generatorParameters><!-- *****************************  Computed content **************************************** --><computedContent>
+		<mountPoint path="/logicalModel/instanceModel/tables/table/matchingTab/defaultMatchingDefinition">
+			<producers>
+				<contentProducer source="/logicalModel/instanceModel/tables/table/matchingTab" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_defaultMatch.xsl">
+					<parameters>
+						<param source=".." name="thisMatching"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/relationships/relationship/copyAfterP2C">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_copy_columns_after_copyP2C.xsl">
+					<parameters>
+						<param source=".." name="relationship"/>
+						<param source="/logicalModel/instanceModel/tables" name="tables"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/relationships/relationship/copyAfterC2P">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_copy_columns_after_copyC2P.xsl">
+					<parameters>
+						<param source=".." name="relationship"/>
+						<param source="/logicalModel/instanceModel/tables" name="tables"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/preview/databaseModel">
+			<producers>
+				<contentProducer source="/logicalModel" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_physical_tables.xsl">
+					<parameters>
+						<param source="/settings/advancedSettings" name="settings"/>
+						<param source="/nativeServices" name="nativeServices"/>
+						<param source="/logicalModel" name="logicalModel"/>
+					</parameters>
+				</contentProducer>
+			</producers><!-- <subContent>
+				<mountPoint path="/logicalModel/instanceModel/tables/table/matchingTab/defaultMatchingDefinition">
+					<producers>
+						<contentProducer source="/logicalModel/instanceModel/tables/table/matchingTab" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_defaultMatch.xsl">
+							<parameters>
+        						<param source=".." name="thisMatching"/>        				
+		    				</parameters>
+    					</contentProducer>
+					</producers>
+				</mountPoint>
+			</subContent>--></mountPoint>
+		<mountPoint path="/preview/systems">
+			<producers>
+				<contentProducer source="/systems" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_system_preview.xsl">
+					<parameters>
+						<param source="/logicalModel/masterModels/masterModel/guiConfig" name="guiConfig"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/preview/inputModel">
+			<producers>
+				<contentProducer source="/logicalModel" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_input_model.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/transformations">
+			<producers>
+				<contentProducer source="/logicalModel" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_transformations.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/dictionary/genTables">
+			<producers>
+				<contentProducer source="/logicalModel/dictionary" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_dictionary_plans.xsl"/>
+			</producers>
+		</mountPoint><!-- ************** for GUI ************** --><mountPoint path="/logicalModel/masterModels/masterModel/guiConfig/guiConstants">
+			<producers>
+				<contentProducer source="/" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/gui/cc_gui_constants.xsl">
+					<parameters/>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/preview/guiPreview">
+			<producers>
+				<contentProducer source="/logicalModel" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_gui_preview.xsl">
+					<parameters>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/documentationRoot[@calculateDoc=&#39;true&#39;]/documentation">
+			<producers>
+				<contentProducer source="/preview/databaseModel" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/com_documentation_content.xsl">
+					<parameters>
+						<param source="/logicalModel" name="logicalModel"/>
+						<param source="/preview/guiPreview" name="guiPreview"/>
+						<param source="/systems" name="systems"/>
+						<param source="/settings" name="settings"/>
+						<param source="/advancedSettings" name="advancedSettings"/>
+						<param source="/outputOperations" name="outputOperations"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/systems/system/sourceMappings/mapping/viewOrigin">
+			<producers>
+				<contentProducer source="/" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_viewOrigin.xsl">
+					<parameters>
+						<param source="../../.." name="thisSystem"/>
+						<param source=".." name="thisMapping"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/tables/table/maxLength">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_instance.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/tables/table/matchingTab/multipleMatching/maxLength">
+			<producers>
+				<contentProducer source="../../.." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_instance.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/tables/table/matchingTab/defaultMatchingDefinition/maxLength">
+			<producers>
+				<contentProducer source="../../.." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_instance.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/masterModels/masterModel/maxLength">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_master.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+						<param source="/maxLength" name="maxLength"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/dictionary/tables/table/maxLength">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_instance.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="//generatedColumnMaxLength">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_maxLength_column.xsl">
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/logicalModel/instanceModel/tables/table/pkValue">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_size_of_pk.xsl">
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/advancedSettings/taskInfoExport/plans">
+			<producers>
+				<contentProducer source="/advancedSettings/taskInfoExport" class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_task_info_export.xsl">
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//entity/cc">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_entity_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations/exportModel//historyMasterEntityDataSource/cc">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_historyMasterDataSource.xsl">
+				</contentProducer>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/advancedSettings//masterTable/cc">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/plugin/cc_history_masterLayer.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//entity/ccf">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_entity_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//planFilteringPublisher/ccp">
+			<producers>
+				<contentProducer source="../../.." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_plan_entity_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//eventPlanPublisher/cc">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_plan_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//expressionTemplateTransformer/cct">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_template_entity_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//template/cc">
+			<producers>
+				<contentProducer source=".." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/cc_handler_entity_name.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations/eventHandler/metaColumns">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/metaColumnsConstant.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/advancedSettings/migration/tidColumns">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/tidColumnsConstant.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/outputOperations//complexExport/metaColumns">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/exportMetaColumns.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/advancedSettings/historyPlugin/metaColumns">
+			<producers>
+				<contentProducer source="." class="com.ataccama.ame.core.contentproducers.XsltContentProducer" templatePath="xslt/historyMetaColumns.xsl"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/dataSources">
+			<producers>
+				<contentProducer class="com.ataccama.ame.core.contentproducers.DataSourceContentProducer"/>
+			</producers>
+		</mountPoint>
+		<mountPoint path="/servers">
+			<producers>
+				<contentProducer class="com.ataccama.ame.core.contentproducers.ServerContentProducer"/>
+			</producers>
+		</mountPoint>
+	</computedContent>
+	<sqlLibraryManager/>
+</metametadata>

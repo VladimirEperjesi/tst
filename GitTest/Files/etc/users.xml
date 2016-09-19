@@ -1,0 +1,8 @@
+<mdc-users>
+  <users>
+    <user username="admin" password="admin" roles="admin,esb_r,esb_rw,remote,steward,vip_browse" />
+    <user username="esb" password="esb" roles="esb_r,esb_rw,remote" />
+    <user username="joe" password="joe" roles="steward,vip_browse" />
+  </users>
+</mdc-users>
+

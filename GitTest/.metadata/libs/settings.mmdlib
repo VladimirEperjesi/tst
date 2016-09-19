@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="GlobalSettingsNode" abstract="false" icon="icons/settings.png" generated="false" name="settings" label="Preferences" explorerLeaf="true" expanded="false">
+			<subNodes>
+				<subNode min="1" id="LengthSettingsNode" max="1"/>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="deletionStrategy" label="Global Source Deletion Strategy" type="enum" required="true" enumValues="deactivate,delete" defaultValue="deactivate">
+					<description>Global settings of Source Deletion Strategy used as default for all newly created load operations 
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;deactivate&lt;/kbd&gt; (default): Records are still part of a match and merge process and can provide business linage (logical delete). Deactivated records are available in export interface (see Export scope setting)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;delete&lt;/kbd&gt;: When a record is deleted it’s no longer available to any MDM hub processes. It is physically deleted from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="scope" label="Global Export Scope Setting" type="enum" required="true" enumValues="active,existing" defaultValue="active">
+					<description>Global settings of the Export Scope used as default for all newly created load operations
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt; (default): export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;
+</description>
+				</attribute>
+				<attribute name="enableRC" label="Generate Record Counters" type="boolean" required="true" defaultValue="true">
+					<description>This option generates Record Counter steps into transformation plans (cleansing, matching, aggregations and merging). Record Counters are typically used to measure the performance of each transformation plan.
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+			</attributes>
+			<description>Preferences node contains global configuration preferences for the whole project.&lt;br/&gt;
+Global setting of Source Deletion Strategy (i.e. record activity) and Export Scope Setting.</description>
+		</node>
+		<node id="AdvancedSettingsNode" name="advancedSettings" newTab="true" label="Advanced Settings" expanded="true">
+			<subNodes>
+				<subNode min="1" id="IgnoredComparisonColumns" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="alternativeKeys" label="Do not Duplicate Compound or Alternative Keys" type="boolean" required="true" defaultValue="false">
+					<description>Use this option to propagate compound or alternative keys from &lt;i&gt;Connected Systems&lt;/i&gt; into the MDM hub storage as separate columns.
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;true&lt;/kbd&gt;: only MDM hub internal primary key &lt;i&gt;source_id&lt;/i&gt; and derived foreign key &lt;i&gt;&amp;lt;parent_entity&amp;gt;_source_id&lt;/i&gt; will be used in MDM hub storage&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;false&lt;/kbd&gt; (default): compound or alternative primary and foreign keys defined in &lt;i&gt;Connected Systems&lt;/i&gt; and also MDM hub internal primary key &lt;i&gt;source_id&lt;/i&gt; and derived foreign key &lt;i&gt;&amp;lt;parent_entity&amp;gt;_source_id&lt;/i&gt; will be used in MDM hub storage&lt;/li&gt;
+&lt;/ul&gt;
+Switch set parameter Load on false and columns are never used, they are seen only in Preview with parameter Load=false.
+&lt;!-- 100 --&gt;</description>
+				</attribute>
+				<attribute name="srcStringLength" label="SRC String Length" type="integer" required="true" defaultValue="100">
+					<description>Length of an attribute on source layer if the attribute type is not string. Eg. birth_date is modeled with day type, but src_birth_date must be string and this parameter determines the string length.</description>
+				</attribute>
+				<attribute name="expStringLength" label="EXP String Length" type="integer" required="true" defaultValue="500">
+					<description>Length of an attribute that stores explanations. The attribute has to be string type only and this parameter determines the string length.</description>
+				</attribute>
+				<attribute name="matchingCompatibility" label="Matching Compatibility Mode" type="boolean" required="true" defaultValue="false">
+					<description>If enabled (&lt;kbd&gt;true&lt;/kbd&gt;), older Extended Unification step will be used instead of the new Matching step. Please note, this has impact on the MDM Hub features which can be utilized! In other words, the following features are not available in compatibility mode:
+&lt;ul&gt;&lt;li&gt;processing cannot run in parallel mode&lt;/li&gt;
+&lt;li&gt;GUI doesn&#39;t allow RW mode&lt;/li&gt;
+&lt;li&gt;out-of-the-box matching exception interfaces are not available neither for backend nor for the GUI&lt;/li&gt;
+&lt;/ul&gt;
+Default:&lt;kbd&gt;false&lt;/kbd&gt;
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@srcStringLength &gt; 0]</expression>
+					<message>Length of the SRC preffiexed attribute has to be greater then 0!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@expStringLength &gt; 0]</expression>
+					<message>Length of the EXP preffiexed attribute has to be greater then 0!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>/logicalModel/masterModels/masterModel/guiConfig[@guiMode=&#39;Read-Write&#39; and @enableGui=&#39;true&#39; and /settings/advancedSettings/@matchingCompatibility=&#39;true&#39;]</expression>
+					<message>If Matching Compatibility Mode is enabled, GUI RW mode should not be used!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>/logicalModel/instanceModel/tables/table/matchingTab/multipleMatching[@disableDefault=&#39;true&#39; and /settings/advancedSettings/@matchingCompatibility=&#39;true&#39;]</expression>
+					<message>If Matching Compatibility Mode is enabled, Advanced Matching Configuration should not be used!</message>
+				</validation>
+			</validations>
+			<description>Global definition of Ignored Comparison Columns, behavior of compound PK and FK on the Instance Layer and default values of generated attributes.</description>
+		</node>
+		<node id="IgnoredComparisonColumns" name="ignoredComparisonColumns" newTab="false" label="Default Ignored Comparison Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="IgnoredComparisonColumn" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>Select input columns that will be ignored only during the batch load processing, i.e. in &lt;i&gt;Change detection&lt;/i&gt; subtask. This option is usually set for attributes where data changes are not business relevant (e.g. relevant record attributes remain unchanged, but record timestamp has changed because of an update of other non-processed attributes)&lt;br/&gt;
+Note: &lt;kbd&gt;source_timestamp&lt;/kbd&gt; column is always ignored by default.
+&lt;!-- 100 --&gt;</description>
+		</node>
+		<node id="IgnoredComparisonColumn" visible="true" name="ignoredComparisonColumn" label="{@names}">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="names" label="Column Name" type="string" required="true">
+					<description>Ignored attribute name from the canonical layer. Wildcard (asterisk) is also supported (eg. src_date*)</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+		ancestor::metadata/preview/databaseModel/instanceTables/physicalTable/columns/column[@isFk=&#39;false&#39; and (@origin=&#39;source&#39; or @origin=&#39;SOURCE&#39;) and not(valueDefinition)]/@name | .
+	</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute visible="true" name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="false">
+					<description>Ignore the specified attribute in &lt;i&gt;Change detection&lt;/i&gt; process for all entities in MDM Hub &lt;i&gt;Logical Model&lt;/i&gt;
+Default: false</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allEntities = &#39;true&#39;]|.[@allEntities=&#39;false&#39;]/entities/entity </expression>
+					<message>Entities must be defined for ignored comparison columns!</message>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="ICCEntities" max="1"/>
+			</subNodes>
+			<description>Provide the list of columns to be ignored</description>
+		</node>
+		<node id="ICCEntities" name="entities" label="Entities" expanded="true">
+			<attributes>
+        
+      </attributes>
+			<subNodes>
+				<subNode min="0" id="ICCEntity" max="-1"/>
+			</subNodes>
+			<description>The difference in comparison of input value in &lt;i&gt;Change detection&lt;/i&gt; process will be ignored for the following list of entities</description>
+		</node>
+		<node id="ICCEntity" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::metadata/preview/databaseModel/instanceTables/physicalTable/@name</selectPath>
+					</valuesProvider>
+					<description>Name of ignored entity</description>
+				</attribute>
+			</attributes>
+			<description>A list of ignored entities can be specified for the defined Ignored Column</description>
+		</node>
+		<node id="LengthSettingsNode" name="lengthValidation" newTab="true" label="Length-Validation Settings" expanded="true">
+			<attributes>
+				<attribute name="databaseType" label="Database Type" type="enum" required="true" enumValues="Apache Derby 10.6+,MS SQL 2008+,Oracle R9+,PostgreSQL 8.2+,IBM DB2 (LUW) 9+,IBM DB2 (z/OS) 10+" defaultValue="Oracle R9+">
+					<description>Choose the vendor of the database you are using. This value will drive validations of table, column, and index name length.
+Default: Oracle</description>
+				</attribute>
+				<attribute name="nmePrefixLength" label="Length of NME Prefix" type="integer" required="true" defaultValue="2">
+					<description>Length of &lt;i&gt;NME&lt;/i&gt; prefix (including underscore at the end) specified in &lt;kbd&gt;nme-config.xml&lt;/kbd&gt; configuration file (by default in &lt;kbd&gt;Files/etc&lt;/kbd&gt; folder).
+This value will drive validations of table, column, and index name length.
+Note: if History Plugin is enabled in &lt;kbd&gt;nme-config.xml&lt;/kbd&gt;, set the length as the maximum value of the NME or History prefix. &lt;!-- 1000 --&gt;
+Default: 2</description>
+				</attribute>
+			</attributes>
+			<description>Database dependent length-validation check for entities, columns, and derived indexes as per the limitations of different database implementations.</description>
+		</node>
+	</nodes>
+</metametadata-library>

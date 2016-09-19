@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config>
+	<!-- mdc_db dataSource must be defined in serverConfig -->
+	<persistenceLayer class="com.ataccama.nme.persistence.vldb.VldbPersistenceFactory">
+		<dataSource>mdc_db</dataSource>
+		<prefix>A_</prefix>
+	</persistenceLayer>
+	<modelDefinitionFile>nme-model.gen.xml</modelDefinitionFile> 
+	<batchLayerDefinitionFile>nme-batch.gen.xml</batchLayerDefinitionFile>
+	<serviceDefinitionFile>nme-services.gen.xml</serviceDefinitionFile>
+	<taskExecutorConfigFile>nme-executor.xml</taskExecutorConfigFile>
+	<!--<securityConfigFile>nme-security.xml</securityConfigFile>-->
+	<plugins>
+        <plugin class="com.ataccama.nme.history.NmeHistoryPlugin">
+            <persistenceLayer class="com.ataccama.nme.persistence.vldb.VldbPersistenceFactory">
+                <dataSource>mdc_db</dataSource>
+                <prefix>H_</prefix>
+            </persistenceLayer>
+            <configFile>nme-history.gen.xml</configFile>
+            <storageDirectory>../storage/history</storageDirectory>
+        </plugin>
+    </plugins>
+</config>

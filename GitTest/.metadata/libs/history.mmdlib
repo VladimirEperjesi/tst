@@ -1,0 +1,290 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library xmlns:fn="http://www.w3.org/2005/xpath-functions">
+	<nodes>
+		<node id="HistoryNode" abstract="false" icon="icons/data_time.png" generated="false" name="historyPlugin" label="History Plugin" explorerLeaf="false">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<subNodes>
+				<subNode min="1" id="InstanceTablesNode" max="1"/>
+				<subNode min="1" id="MasterTablesNode" max="1"/>
+				<subNode min="1" id="ReferenceDataTablesNode" max="1"/>
+				<subNode min="1" id="MetaColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="true">
+					<description>Enable history plugin.&lt;br/&gt;
+Please note there might be necessary to setup database persistance for the historical tables in &lt;i&gt;etc/nme-config.xml&lt;/i&gt;.</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/plugin/gen_history_model.xsl" fileNameTemplate="Files/etc/nme-history.gen.xml"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+					</parameters>
+				</gen>
+			</generators>
+			<description>History Plugin enables keeping history of records in MDM hub.
+&lt;!-- 100 incl. all subnodes --&gt;</description>
+		</node>
+		<node id="InstanceTablesNode" name="instanceTables" label="Instance Tables" explorerLeaf="false" expanded="true">
+			<subNodes>
+				<subNode min="0" id="InstanceTableNode" max="-1"/>
+			</subNodes>
+			<attributes>
+				
+			
+			
+			
+			</attributes>
+			<editors>
+				
+				
+			
+			</editors>
+			<description>Selection of instance entities to be kept in history.</description>
+		</node>
+		<node id="MasterTablesNode" name="masterTables" label="Master Tables" explorerLeaf="false" expanded="true">
+			<attributes>
+				
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="MasterTableNode" max="-1"/>
+			</subNodes>
+			<description>Selection of master entities to be kept in history.</description>
+		</node>
+		<node id="ReferenceDataTablesNode" name="referenceDataTables" label="Reference Data Tables" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ReferenceDataTableNode" max="-1"/>
+			</subNodes>
+			<description>Selection of reference data entities (i.e. instance tables) to be kept in history.</description>
+		</node>
+		<node id="InstanceTableNode" name="instanceTable" label="Instance Table" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="1" id="InstanceColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="entityName" label="Entity Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+							/preview/databaseModel/instanceTables/*
+						
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Name of a table from the Instance Layer of the Logical Model.</description>
+				</attribute>
+				<attribute name="allColumns" label="Use All Columns" type="boolean" required="true" defaultValue="false">
+					<description>Allows to export all available columns.</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and instanceColumns/instanceColumn]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>../instanceTable/@entityName</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;entityName&#39;</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allColumns=&#39;false&#39;]/instanceColumns/instanceColumn|.[@allColumns=&#39;true&#39;]</expression>
+					<message>Instance entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+			<description>A particular selected table.</description>
+		</node>
+		<node id="InstanceColumnsNode" abstract="false" visibleInParent="true" visible="true" name="instanceColumns" label="Columns" explorerLeaf="false" expanded="false">
+			<subNodes>
+				<subNode min="0" id="InstanceColumnNode" max="-1"/>
+			</subNodes>
+			<description>List of columns defined for a selected table from the &lt;i&gt;Instance Layer&lt;/i&gt;.&lt;br/&gt;
+The following columns are added by default:
+&lt;li&gt;&lt;kbd&gt;id&lt;/kbd&gt; (long)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_active&lt;/kbd&gt; (boolean)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_origin&lt;/kbd&gt; (string)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_source_system&lt;/kbd&gt; (string)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_source_timestamp&lt;/kbd&gt; (datetime)&lt;/li&gt;
+&lt;!-- 1040 --&gt;
+</description>
+		</node>
+		<node id="InstanceColumnNode" visibleInParent="true" name="instanceColumn" label="Instance Column" explorerLeaf="false" expanded="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Name of column from a selected table.</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::instanceTable/@entityName)]/columns/column[not(tokenize(@name,&#39;_&#39;, 1)=&#39;eng&#39;) and @name!=&#39;id&#39;]
+</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="trace" label="Trace" type="boolean" required="true" defaultValue="true">
+					<description>&lt;b&gt;True&lt;/b&gt; - changes of this column are considered as record change and new version of record is created and stored.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - changes of this column are ignored, i.e. this column is only stored in case of change in other traced column.</description>
+				</attribute>
+				<attribute visible="false" name="searchable" label="Searchable" type="boolean" required="true" defaultValue="false">
+					<description>&lt;b&gt;True&lt;/b&gt; - this column is stored as separate persistence column to support filtering.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - this column is stored in BLOB, all non-searchable columns are stored in one compressed BLOB to conserve space, however efficient filtering on this column is not possible.</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="MasterTableNode" name="masterTable" label="Master Table" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="1" id="MasterColumnsNode" max="1"/>
+				<subNode min="1" id="ccMasterTableNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="entityName" label="Entity Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+							/preview/databaseModel/masterTables/*
+						
+						</selectPath>
+						<valueTemplate>{@name} ({@layerName})</valueTemplate>
+						<labelTemplate>{@name} ({@layerName})</labelTemplate>
+					</valuesProvider>
+					<description>Name of a table from a particular Master Data Layer of the Logical Model.</description>
+				</attribute>
+				<attribute name="allColumns" label="Use All Columns" type="boolean" required="true" defaultValue="false">
+					<description>Allows to export all available columns.</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and masterColumns/masterColumn]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>../masterTable/@entityName</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;entityName&#39;</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allColumns=&#39;false&#39;]/masterColumns/masterColumn|.[@allColumns=&#39;true&#39;]</expression>
+					<message>Master entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+			<description>A particular selected table.</description>
+		</node>
+		<node id="MasterColumnsNode" name="masterColumns" label="Columns">
+			<subNodes>
+				<subNode min="0" id="MasterColumnNode" max="-1"/>
+			</subNodes>
+			<description>List of columns defined for a selected table from the &lt;i&gt;Master Data Layer&lt;/i&gt;.&lt;br/&gt;
+The following columns are added by default:
+&lt;li&gt;&lt;kbd&gt;id&lt;/kbd&gt; (long)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_active&lt;/kbd&gt; (boolean)&lt;/li&gt;
+&lt;!-- 1040 --&gt;</description>
+		</node>
+		<node id="MasterColumnNode" name="masterColumn" label="Master Column" expanded="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Name of column from a selected table.</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/masterTables/physicalTable[(@name = $current/ancestor::masterTable/cc/@entity) and  (@layerName = $current/ancestor::masterTable/cc/@layer)]/columns/column[not(tokenize(@name,&#39;_&#39;, 1)=&#39;eng&#39;) and @name!=&#39;id&#39;]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="trace" label="Trace" type="boolean" required="true" defaultValue="true">
+					<description>&lt;b&gt;True&lt;/b&gt; - changes of this column are considered as record change and new version of record is created and stored.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - changes of this columns are ignored, i.e. this column is only stored in case of change in other traced column.</description>
+				</attribute>
+				<attribute visible="false" name="searchable" label="Searchable" type="boolean" required="true" defaultValue="false">
+					<description>&lt;b&gt;True&lt;/b&gt; - this column is stored as separate persistence column to support filtering.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - this column is stored in BLOB, all non-searchable columns are stored in one compressed BLOB to conserve space, however efficient filtering on this column is not possible.</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="ReferenceDataTableNode" name="referenceDataTable" label="Reference Data Table" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="1" id="ReferenceDataColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="entityName" label="Entity Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+							/preview/databaseModel/refData/*
+						
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Name of a table from the Reference Data definition of the Logical Model.</description>
+				</attribute>
+				<attribute name="allColumns" label="Use All Columns" type="boolean" required="true" defaultValue="false">
+					<description>Allows to export all available columns.</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and referenceDataColumns/referenceDataColumn]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>../referenceDataTable/@entityName</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;entityName&#39;</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allColumns=&#39;false&#39;]/referenceDataColumns/referenceDataColumn|.[@allColumns=&#39;true&#39;]</expression>
+					<message>Reference Data entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+			<description>A particular selected table.</description>
+		</node>
+		<node id="ReferenceDataColumnsNode" name="referenceDataColumns" label="Columns">
+			<subNodes>
+				<subNode min="0" id="ReferenceDataColumnNode" max="-1"/>
+			</subNodes>
+			<description>List of columns defined for a selected table from the &lt;i&gt;Reference Data&lt;/i&gt; definition.
+The following columns are added by default (the list is the same as for the Instance Data):
+&lt;li&gt;&lt;kbd&gt;id&lt;/kbd&gt; (long)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_active&lt;/kbd&gt; (boolean)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_origin&lt;/kbd&gt; (string)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_source_system&lt;/kbd&gt; (string)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;eng_source_timestamp&lt;/kbd&gt; (datetime)&lt;/li&gt;
+&lt;!-- 1040 --&gt;</description>
+		</node>
+		<node id="ReferenceDataColumnNode" name="referenceDataColumn" label="Reference Data Column" expanded="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Name of column from a selected table.</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/refData/physicalTable[@name=lower-case($current/ancestor::referenceDataTable/@entityName)]/columns/column[not(tokenize(@name,&#39;_&#39;, 1)=&#39;eng&#39;) and @name!=&#39;id&#39;]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="trace" label="Trace" type="boolean" required="true" defaultValue="true">
+					<description>&lt;b&gt;True&lt;/b&gt; - changes of this column are considered as record change and new version of record is created and stored.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - changes of this columns are ignored, i.e. this column is only stored in case of change in other traced column.</description>
+				</attribute>
+				<attribute visible="false" name="searchable" label="Searchable" type="boolean" required="true" defaultValue="false">
+					<description>&lt;b&gt;True&lt;/b&gt; - this column is stored as separate persistence column to support filtering.
+&lt;/br&gt;&lt;b&gt;False&lt;/b&gt; - this column is stored in BLOB, all non-searchable columns are stored in one compressed BLOB to conserve space, however efficient filtering on this column is not possible.</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="MetaColumnsNode" visible="false" generated="true" name="metaColumns" explorerLeaf="true">
+			<subNodes>
+				<subNode min="0" id="MetaColumnNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="MetaColumnNode" name="metaColumn">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="layer" type="string"/>
+			</attributes>
+		</node>
+		<node id="ccMasterTableNode" sortChildren="false" visible="false" generated="true" name="cc">
+			<attributes>
+				<attribute name="entity" type="string"/>
+				<attribute name="layer" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

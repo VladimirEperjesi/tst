@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<imports>
+
+	</imports>
+	<nodes>
+		<node id="MigrationNode" abstract="false" visibleInParent="true" icon="icons/gears_run.png" sortChildren="true" visible="true" name="migration" label="Migration">
+			<subNodes>
+				<subNode min="1" id="MigrationExportNode" max="1"/>
+				<subNode min="1" id="MigrationLoadNode" max="1"/>
+				<subNode min="1" id="tidColumnsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Migration Export Plan" fileNameTemplate="Files/engine/migration/migration_export.comp"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Migration Load Plan" fileNameTemplate="Files/engine/migration/migration_load.comp"/>
+			</editors>
+			<description>Migration operations are maintenance activities composed of migration export and load, and are used to perform tasks like:&lt;/br&gt;
+- changing rules and effectivelly apply them to all records&lt;/br&gt;
+- adding a new connected system with huge amount of records into an existing solution&lt;/br&gt;
+- upgrading from older version
+
+&lt;!-- 1030 --&gt;</description>
+		</node><!-- Logical data model: tables --><!-- MN relationships BRIDGES --><!-- COLUMNS to be used in views --><!-- VIEW GROUPS --><!-- <node id="GuiHierarchyViewNode" inherits="GuiViewNode" name="hierarchyView" label="Hierarchy View">
+			<subNodes>
+			
+			
+			
+			
+			
+			<subNode min="1" id="GuiViewSameEntityColumnListNode" max="1"/>
+			</subNodes>
+		<attributes>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="false">
+					<description>Display all available columns of the entity</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+           			<expression>.[@allColumns=&#39;false&#39;]/columns/column|.[@allColumns=&#39;true&#39;]</expression>
+           			<message>Breadcrumb view has no defined columns!</message>
+       			</validation>
+			</validations>
+		<description>Definition of Hierarchy view</description>
+		</node> --><!-- EDIT GROUPS --><node id="MigrationExportNode" name="migrationExport" newTab="false" label="Migration Export" expanded="true">
+			<attributes>
+				<attribute name="migExport" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Enables migration export capability, i.e. migration export operation and corresponding plan are generated.</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/migration/migration_export.comp</fileNameTemplate>
+					<source>.[@migExport=&#39;true&#39;]</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/advancedSettings" name="advancedSettings"/>
+						<param source="/logicalModel/instanceModel" name="instanceModel"/>
+					</parameters>
+					<templatePath>xslt/gen_migration_export.xsl</templatePath>
+				</gen>
+			</generators>
+			<editors>
+				
+			</editors>
+			<description>Definition of migration export operation.</description>
+		</node>
+		<node id="MigrationLoadNode" name="migrationLoad" newTab="false" label="Migration Load" expanded="true">
+			<attributes>
+				<attribute name="migLoad" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Enables migration load capability, i.e. migration export operation and corresponding plan are generated.</description>
+				</attribute>
+				<attribute name="loadId" label="Load Id" type="boolean" required="true" defaultValue="false">
+					<description>Load and preserve &lt;i&gt;id&lt;/id&gt; column that is assigned by the engine.&lt;/br&gt;
+WARNING: sequence in the DB used has to be set up properly, e.g. the sequence has to be bigger than the biggest id and also master_id ever assigned!</description>
+				</attribute>
+				<attribute name="loadEng" label="Load Engine Columns" type="boolean" required="true" defaultValue="false">
+					<description>Enables to preserve engine metadata columns (both dates and transactional ids)</description>
+				</attribute>
+				<attribute name="loadHist" label="Load Previous Distinct Value Columns" type="boolean" required="true" defaultValue="false">
+					<description>Enables to preserve Previous Distinct Values (so-called history collector columns)</description>
+				</attribute>
+				<attribute name="loadMatch" label="Load Matching Columns" type="boolean" required="true" defaultValue="false">
+					<description>Enables to preserve selected matching results (by default master_id column, keeper flag and isolate flag is preserved). &lt;/br&gt;
+Other columns like rule_name have to be specified by a user.</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/migration/migration_load.comp</fileNameTemplate>
+					<source>.[@migLoad=&quot;true&quot;]</source>
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instanceTables"/>
+						<param source="ancestor::system" name="system"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+						<param source="/advancedSettings" name="advancedSettings"/>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+						<param source="/logicalModel/instanceModel" name="instanceModel"/>
+					</parameters>
+					<templatePath>xslt/gen_migration_load.xsl</templatePath>
+				</gen>
+			</generators>
+			<editors>
+				
+			</editors>
+			<subNodes>
+				<subNode min="1" id="SelectedMatchingColumnsNode" max="1"/>
+			</subNodes>
+			<description>Definition of migration load operation.</description>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" severity="info" inverseCondition="true">
+					<expression>.[@migLoad=&#39;false&#39; and (@loadId=&#39;true&#39; or @loadEng=&#39;true&#39; or @loadHist=&#39;true&#39; or @loadMatch=&#39;true&#39;)]</expression>
+					<message>Migration Load is not enabled!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="tidColumnsNode" visible="false" generated="true" name="tidColumns" explorerLeaf="true">
+			<subNodes>
+				<subNode min="0" id="tidColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="tidColumnNode" name="tidColumn">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+			</attributes>
+		</node>
+		<node id="SelectedMatchingColumnsNode" visibleInParent="true" visible="true" name="selectedMatchingColumns" label="Selected Matching Columns" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedMatchingColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="SelectedMatchingColumnNode" visibleInParent="true" name="selectedMatchingColumn" label="Selected Matching Column">
+			<attributes>
+				<attribute name="name" label="Column Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::metadata/preview/databaseModel/instanceTables/physicalTable[not(columns/column/@name=preceding-sibling::physicalTable/columns/column/@name)]/columns/column[@origin=&#39;match&#39;]/@name</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="false"/>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;true&#39; and selectedEntities/selectedEntity]</expression>
+					<message>If All Entities is defined Selected Entities can&#39;t be used!</message>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="SelectedEntitiesNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="SelectedEntitiesNode" visibleInParent="true" name="selectedEntities" label="Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedEntityNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="SelectedEntityNode" visibleInParent="true" name="selectedEntity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>ancestor::metadata/preview/databaseModel/instanceTables/physicalTable[columns/column/@name=lower-case($current/ancestor::selectedMatchingColumn/@name)]/@name</selectPath>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			
+			
+			
+			
+			
+			</subNodes>
+		</node>
+	</nodes>
+</metametadata-library>

@@ -1,0 +1,498 @@
+/* PREDEFINED styles : styles defined on individual components (predefined by components) */
+
+/* ====== fieldGid ====== */
+/* field grid header */
+
+.TFieldGrid-header {
+}
+
+/* field grid field header */
+.TFieldGrid-field-header {
+	color: #9B9B9B;
+	font-weight: normal;
+	padding: 6px 0px;
+}
+
+.TFieldGrid-field-separator {
+}
+
+.TFieldGrid-field-separator div {
+	margin: 12px;
+	display: inline;
+	border-right: 1px solid #D2D2D2;
+}
+
+.rowIteratorHeader {
+  color: #9B9B9B;
+  font-weight: normal;	
+  padding-right:5px;	
+}
+
+.rowIteratorFieldSeparator {
+  background: url('images/h-data-separator.png'); 
+  width:15px; 
+  height:16px;
+  display:inline-block;
+  vertical-align: text-bottom;
+}
+
+.rowIteratorValue {
+  padding-left: 5px;
+}
+
+/* field grid value */
+.TFieldGrid-field-value {
+  color: #383838;
+  padding: 6px 3px;
+  font-weight: normal;
+  width: 100%;
+  line-height: 154%;
+}
+
+.data-value {
+  color: #383838;
+  padding: 6px;
+  line-height: 154%;
+}
+
+.TFieldGrid-field {	
+}
+
+.TFieldGrid-dataRow {
+	padding: 0px 16px;
+}
+
+.TFieldGrid-dataRow-odd {
+
+}
+
+.TFieldGrid-dataRow-even {
+	
+}
+
+.TFieldGrid-dataRow-last {
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.TFieldGrid-dataRow:HOVER {
+  background: #F0F0F0;
+}
+
+/* field grid data */
+.TFieldGrid-data {
+  width: 100%;
+  border-spacing: 0px;
+  margin-bottom: 2px;
+}
+
+/* ====== field parts ====== */
+
+/* any field part */
+.TFieldPart {
+  padding: 3px 10px;
+}
+
+/* label field */
+.TFieldLabel {
+   display: inline-block;
+}
+
+/* value field and its hover */
+.TFieldValue{
+    color: #888;
+    background-color: #FFF;
+}
+.TFieldValue:HOVER{
+    color: #000;
+    background-color: #eee;
+}
+/* value field in dependency on validity */
+.TFieldValue .TFieldValidityValid {
+  color: #008000;
+}
+
+.TFieldValue .TFieldValidityInvalid {
+  color: #800000;
+}
+
+/* confirmed value field and its hover */
+.TFieldConfirmedValue{
+    color: #8A8;
+}
+.TFieldConfirmedValue:HOVER{
+    color: #000;
+    background-color: #eee;
+}
+
+/* description field */
+.TFieldDescription{
+}
+
+/* validity field */
+.TFieldValidity{
+  flow: right;
+}
+
+/* validity field label */
+.TFieldValidityLabel {
+  padding: 0px 8px;
+}
+
+/* DELETE? explicit image displayed in the validity field */
+.TFieldValidityImage{
+}
+
+/* valid validity field */
+.TFieldPart.TFieldValidity.TFieldValidityValid {
+  color: #008000;  
+  background: url("${appPrefix}/media?file='images/validBackground.png'") 0px 4px no-repeat;
+}
+
+/* invalid validity field */
+.TFieldPart.TFieldValidity.TFieldValidityInvalid {
+  color: #A00000;
+  /* sets background from the server's directory via RDM media servlet */
+  background: url("${appPrefix}/media?file='images/invalidBackground.png'") 0px 4px no-repeat;  
+}
+
+/* ====== rowGrid & pager/nonPagedStatusBar ====== */
+
+/* status bar under the RowGrid when paged=false */
+.TCNonPagedStatusBar {
+}
+/* label in the status bar when paged=false (pager replacement) it displays just rows range, e.g. 1-10 or 0-0  */
+.TCNonPagedStatusBarLabel {
+  padding: 1px 5px;
+}
+
+/* Tab header customization */
+.TTabHeader {
+}
+
+/* Tab header's image */
+.TTabImage {
+}
+
+/* Tab header's label */
+.TTabLabel {
+  
+}
+
+/* LOCAL styles - user-defined and referenced from tmpl or layout file */
+
+.t_innerFillPanel {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.fieldPaneLabel {
+  border-bottom:1px solid #abc;  
+  background: #666670;
+  color:#fff;  
+  padding:10px;
+}
+
+.borderedSection {
+  position:absolute; 
+  left:0px; 
+  right:0px; 
+  top:0px; 
+  bottom:0px; 
+  margin: 5px; 
+  border:1px solid #888;
+  border-radius: 4px;
+}
+
+.scrollableSection {
+  padding: 5px;
+  overflow: auto;
+}
+
+.t_fieldTemplate {
+  border: 1px solid #ccc;
+  margin: 2px 5px;
+  border-radius: 5px;
+}
+
+.mda-BorderedSection {
+  border-color: #D9D9D9;
+  border-width: 1px;
+  border-style: solid;
+  background: #FFF;
+  padding: 0px;
+  border-radius: 7px;
+  /* max-width: 600px; */
+  width:570px;
+}
+
+.editMode.mda-BorderedSection {
+  border-color: #C7BED3;
+  border-width: 1px;
+  border-style: solid;  
+  background: #fff;
+  padding: 0px;
+  border-radius: 7px;
+}
+
+.mda-nonBorderedSection {
+	margin: 10px;
+	background: transparent;
+}
+
+.mda-nonBorderedSection .TComponentHeader {
+	background: transparent;
+}
+
+.mda-columnsPanel {
+	display:table;
+	width:100%;
+}
+
+.mda-halfWidthColumn {
+	display: table-cell; 
+	width:50%; 
+	vertical-align:top;	
+}
+
+.mda-rightContentMargin {
+	width: auto;
+	margin: 10px 20px 25px 10px;
+}
+
+.mda-leftContentMargin {
+	width: auto;
+	margin: 10px 10px 25px 20px;
+}
+
+.mda-leftRightContentMargin {
+	width: auto;
+	margin: 10px 20px;
+}
+
+.mda-limitWidthContentContainer {
+	margin:0 auto; 
+	position:relative; 
+	padding:0px; 
+	border: 0px; 
+	max-width: 1200px;
+}
+
+.mda-Section-title {
+  color: #bbf;
+}
+
+.TComponentHeader {
+  color: #67AD31;
+  font-family: open sans;
+  font-size: 1.2em;
+  padding: 16px;
+  border-bottom: 0px solid transparent;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  background-image: none;
+  position: relative;
+  line-height: 100%;
+}
+
+.TComponentLabel-empty {
+  color: #888;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  position: relative;
+  top: 10%;
+  padding: 8px 0px;
+}
+
+.iteratorRow-inner {
+	position:relative; 
+	left:0px; right:0px; top: 0px; bottom: 0px;
+	border-radius: 4px; 
+	padding:0px 16px; 
+	min-height: 15px;
+}
+
+.TRowIterator-row {
+   padding: 0px 16px;
+}
+
+.TRowIterator-row-even {
+
+}
+
+.TRowIterator-row-odd {
+
+}
+
+.TRowIterator-row:HOVER {
+  background: #F0F0F0;   
+}
+
+.TRowIterator-row-last {
+	border-bottom: none;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.TRowIterator-row-selected {
+	background: #E9F5DC;
+}
+
+.TRowIterator-row-selectionWrapper {
+	cursor: default;
+}
+
+.TRowGrid-grid {
+  /* border: 1px solid #ccc; */
+}
+
+.mda-Section-RowLabel {
+  
+}
+
+.mda-Section-RowValue {
+
+}
+
+.linkImage {
+  width: 16px;
+  vertical-align: text-top;
+}
+.linkImage:HOVER {
+  cursor: pointer;
+}
+
+.activityState {
+	float:right;
+	width: 16px; 
+	margin-top: 0.7em;
+}
+
+.TFieldGrid-dataRow-last .TFieldGrid-field {
+	border-bottom: 0px transparent;
+}
+
+.TComponentElement {
+	image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+.headerButtonActionAdd {
+	background: url('images/action-create.png') no-repeat scroll center center transparent;
+}
+.headerButtonActionAdd:HOVER {
+	cursor: pointer;
+	background: url('images/action-create-hover.png') no-repeat scroll center center;
+}
+.TComponentElement-disabled.headerButtonActionAdd {
+	display: none;
+}
+.TComponentElement-disabled.headerButtonActionAdd:HOVER {
+	display: none;
+}
+
+.headerButtonActionDeactivate {
+	background: url('images/action-deactivate.png') no-repeat scroll center center transparent;
+}
+.headerButtonActionDeactivate:HOVER {
+	cursor: pointer;
+	background: url('images/action-deactivate-hover.png') no-repeat scroll center center;
+}
+.TComponentElement-disabled.headerButtonActionDeactivate {
+	display: none;
+}
+.TComponentElement-disabled.headerButtonActionDeactivate:HOVER {
+	display: none;
+}
+
+.headerButtonActionActivate {
+	background: url('images/action-activate.png') no-repeat scroll center center;
+}
+.headerButtonActionActivate:HOVER {
+	cursor: pointer;
+	background: url('images/action-activate-hover.png') no-repeat scroll center center;
+}
+.TComponentElement-disabled.headerButtonActionActivate {
+	display: none;
+}
+.TComponentElement-disabled.headerButtonActionActivate:HOVER {
+	display: none;
+}
+
+.headerButtonAction-instance-drop {
+	background: url('images/action-split.png') no-repeat center;
+}
+.headerButtonAction-instance-drop:HOVER {
+	background: url('images/action-split-hover.png') no-repeat center;
+	cursor: pointer;
+}
+.TComponentElement-disabled.headerButtonAction-instance-drop {
+	display: none;
+}
+
+.headerButtonAction-instance-rebind {
+	background: url('images/action-merge.png') no-repeat center;
+}
+.headerButtonAction-instance-rebind:HOVER {
+	background: url('images/action-merge-hover.png') no-repeat center;
+	cursor: pointer;
+}
+.TComponentElement-disabled.headerButtonAction-instance-rebind {
+	display: none;
+}
+
+.headerButtonShowAll {
+	background: #f0f0f0;
+	font-size: 0.9em;
+	color: #888;
+	margin: 0px 15px;
+	display: inline-block;
+	padding: 3px;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+	width: auto;
+}
+.headerButtonShowAll:HOVER {
+	background: #ddd;
+	color: #222;
+	cursor: pointer;
+}
+
+.rowState-deactivated .data-value {
+	color: #b5b5b5;
+	text-decoration: line-through;
+}
+
+.rowState-deactivated .rowIteratorHeader {
+	color: #b5b5b5;
+	text-decoration: line-through;
+}
+
+.rowState-not-deleted {
+	
+}
+
+.scrollContent {
+	padding: 10px;
+	background: #f2f2f2;
+}
+
+.headerButtonActionAdd,
+.headerButtonActionAdd:HOVER,
+.headerButtonActionActivate,
+.headerButtonActionActivate:HOVER,
+.headerButtonActionDeactivate,
+.headerButtonActionDeactivate:HOVER,
+.headerButtonAction-instance-drop,
+.headerButtonAction-instance-drop:HOVER,
+.headerButtonAction-instance-rebind,
+.headerButtonAction-instance-rebind:HOVER {
+	background-size: 74%;
+}

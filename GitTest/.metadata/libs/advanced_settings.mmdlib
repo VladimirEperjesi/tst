@@ -1,0 +1,274 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<imports>
+		<import file="libs/history.mmdlib" prefix="hist"/>
+		<import file="libs/migration.mmdlib" prefix="mig"/>
+		<import file="libs/manualMatch.mmdlib" prefix="manualMatch"/>
+	</imports>
+	<nodes>
+		<node id="AdvancedSettingsNode" abstract="false" icon="icons/gear.png" name="advancedSettings" label="Advanced Features">
+			<subNodes>
+				<subNode min="1" id="manualMatch.ManualMatchNode" max="1"/>
+				<subNode min="1" id="TaskInfoExportNode" max="1"/>
+				<subNode min="1" id="ReprocessingSettingsNode" max="1"/>
+				<subNode min="1" id="hist.HistoryNode" max="1"/>
+				<subNode min="1" id="mig.MigrationNode" max="1"/>
+			</subNodes>
+			<editors>
+				
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Defines advanced operations like entity reprocessing and task execution export</description>
+		</node>
+		<node id="ReprocessingSettingsNode" icon="icons/reprocess.png" name="reprocessSettings" newTab="true" label="Reprocess Settings" explorerLeaf="false">
+			<subNodes>
+				<subNode min="1" id="ReprocessingSettingNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="reprocess" class="com.ataccama.ame.core.editors.CreateChild" label="New Reprocessing">
+
+		</editor>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Reprocess operations are used to trigger and perform data re-computation on single entity (table) or the whole MDM Hub (Partial or Full reprocess). It is useful to apply the new cleansing, matching, and merging rules when there are changes. The reprocess is very similar to load operation except it doesn&#39;t detect data changes at the input.</description>
+		</node>
+		<node id="AbstractReprocessTypeNode" abstract="true" sortChildren="true" name="type">
+			<subNodes>
+				
+				
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Reprocessing"/>
+			</editors>
+			<generators>
+				
+			</generators>
+		</node>
+		<node id="FullReprocessTypeNode" inherits="AbstractReprocessTypeNode" name="full" label="Full Reprocess ({@plan})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="ReprocessingEntitiesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="plan" label="Reprocess Operation Name" type="string" required="true">
+					<description>Name of the reprocess operation</description>
+				</attribute>
+				<attribute visible="true" name="allTables" label="Reprocess All Entities" type="boolean" required="true" defaultValue="true">
+					<description>Check this option to reprocess all MDM Hub tables (i.e. &lt;i&gt;Instance Layer and Master Layer&lt;/i&gt;)</description>
+				</attribute>
+				<attribute name="rematchAll" label="Rematch All/Selected Entities" type="boolean" required="true" defaultValue="false">
+					<description>If true, all rematch flag columns will be set to true and therefore all records will be not only reprocessed but also rematched.&lt;/br&gt;
+WARNING! Performing the rematch action means, the manual match exceptions entered by any user will be removed and matching will be recalculated!!! This is also true for manually added/edited records using the GUI.
+&lt;!-- 1030 --&gt;</description>
+				</attribute>
+				<attribute name="ignorePersistence" label="Ignore Persistence" type="boolean" required="true" defaultValue="false">
+					<description>Full Reprocess operation has performance optimization that is available only when Process All Entities is enabled.&lt;/br&gt;
+MDC process is optimized to ignore records in the persistence in several phases:
+&lt;ul&gt;
+&lt;li&gt;in CopyColumn no records are read from persistence&lt;/li&gt;
+&lt;li&gt;in Match no records are expanded&lt;/li&gt;
+&lt;li&gt;in Merge, the Prepare phase does not read records from persistence&lt;/li&gt;
+&lt;/ul&gt;   
+&lt;!-- 1030 --&gt; </description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Full Reprocess description</description>
+				</attribute>
+			</attributes>
+			<editors>
+				
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@allTables=&#39;false&#39;]/entities/entity|.[@allTables=&#39;true&#39;]</expression>
+					<message>Load operation has no defined entities!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@ignorePersistence=&#39;true&#39; and @allTables=&#39;false&#39;]</expression>
+					<message>Ignore Persistence optimisation can be used only when all entities are selected for the reprocess!</message>
+				</validation>
+			</validations>
+			<description>Allows reprocessing of all or selected entities to apply new or changed rules</description>
+		</node>
+		<node id="PartialReprocessTypeNode" inherits="AbstractReprocessTypeNode" icon="icons/plan.png" name="partial" label="Partial Reprocess ({@plan})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="PartialReprocessingEntitiesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="plan" label="Reprocess Plan Name" type="string" required="true">
+					<description>Name of the reprocess plan</description>
+				</attribute>
+				<attribute name="recordId" label="Record Identification" type="enum" required="true" enumValues="SOURCE_ID + ORIGIN,ID (instance)" defaultValue="SOURCE_ID + ORIGIN">
+					<description>There are two ways how to identify records to be reprocessed:&lt;br/&gt;
+&lt;li&gt;&lt;i&gt;SOURCE_ID + ORIGIN&lt;/i&gt; (default): source_id and origin atributes are used to identify a record &lt;/li&gt;
+&lt;li&gt;&lt;i&gt;ID&lt;/i&gt;: id attribute is used to identify a record&lt;/li&gt;</description>
+				</attribute>
+				<attribute name="allTables" label="Reprocess All Tables" type="boolean" required="true" defaultValue="true">
+					<description>Reprocess all tables
+Default: &lt;i&gt;true&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="enableRematch" label="Enable Rematch" type="boolean" required="true" defaultValue="false">
+					<description>This option allows to define a rematch flags for all records to be reprocessed across all entities. If more matchings per one entity are defined, all rematch flags are available as a part of the reprocess interface.&lt;/br&gt;
+If a flag is set to &lt;i&gt;true&lt;/i&gt; the records will be not only reprocessed, but also rematched.&lt;/br&gt;
+WARNING! Performing the rematch action means, the manual match exceptions entered by any user will be removed and matching will be recalculated!!! This is also true for manually added/edited records using the GUI.
+&lt;!-- 1030 --&gt;</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Partial Reprocess description</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" fileNameTemplate="Files/engine/load/reprocess/{@plan}.comp"/>
+			</editors>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_reprocessing.xsl" fileNameTemplate="Files/engine/load/reprocess/{@plan}.comp">
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instances"/>
+					</parameters>
+				</gen>
+			</generators><!-- <validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[entities/entity/@name and @enableRematch=&#39;true&#39;]</expression>
+			
+					<message>Glabal Enable Rematch option can be used only when all entities are selected for the reprocess! Either disable this option or delete entities from the list of reprocessed entities and select Reprocess All.</message>
+				</validation>
+       			
+   			</validations>--><description>Allows reprocessing of selected records from selected entities to apply new or changed rules</description>
+		</node>
+		<node id="ReprocessingEntitiesNode" name="entities" label="Entities to Reprocess" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ReprocessingEntityNode" max="-1"/>
+			</subNodes>
+			<description>List of entities to be reprocessed</description>
+		</node>
+		<node id="ReprocessingEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Entity name</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@name and ../../@allTables=&#39;true&#39;]</expression><!--<expression>.[@allTables=&#39;true&#39; and entities/entity]</expression>--><message>Either disable option &quot;All Entities&quot; or delete entities from the list of reprocessed entities.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="PartialReprocessingEntitiesNode" name="entities" label="Entities to Reprocess" expanded="true">
+			<subNodes>
+				<subNode min="0" id="PartialReprocessingEntityNode" max="-1"/>
+			</subNodes>
+			<description>List of entities to be reprocessed</description>
+		</node>
+		<node id="PartialReprocessingEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Entity name</description>
+				</attribute>
+				<attribute name="enableRematch" label="Enable Rematch" type="boolean" required="true" defaultValue="false">
+					<description>This option allows to define a rematch flags for all records to be reprocessed for selected entity. If more matchings per one entity are defined, all rematch flags are available as a part of the reprocess interface.&lt;/br&gt;
+If a flag is set to &lt;i&gt;true&lt;/i&gt; the records will be not only reprocessed, but also rematched.&lt;/br&gt;
+WARNING! Performing the rematch action means, the manual match exceptions entered by any user will be removed and matching will be recalculated!!! This is also true for manually added/edited records using the GUI.
+&lt;!-- 1030 --&gt;</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[entities/entity/@name and @enableRematch=&#39;true&#39;]</expression>
+					<message>Glabal Enable Rematch option can be used only when all entities are selected for the reprocess! Either disable this option or delete entities from the list of reprocessed entities and select Reprocess All.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@name and ../../@allTables=&#39;true&#39;]</expression><!--<expression>.[@allTables=&#39;true&#39; and entities/entity]</expression>--><message>Either disable option &quot;All Entities&quot; or delete entities from the list of reprocessed entities.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="ReprocessingSettingNode" name="reprocess" label="Reprocess Type" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractReprocessTypeNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="tables" class="com.ataccama.ame.core.editors.CreateChild" label="New Reprocess Plan">
+		<!-- Create child is used when you need to create new node. Standard property dialog will be opened in order to get information about the new node. 
+		MMD configuration has following attributes:
+class - com.ataccama.ame.core.editors.CreateChild
+label - optional label for the command which will be displayed in the popup menu. 
+		If not specified, the default label will be used.
+targetNodePath - optional MD path expression identifying the parent node, where the child node will be edited. 
+		The path is relative to the current node and if not specified the current node will be used. -->
+		</editor>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Types of Reprocess operations</description>
+		</node>
+		<node id="TaskInfoExportNode" icon="icons/scroll_run.png" name="taskInfoExport" label="Task Information Export" explorerLeaf="true" expanded="false">
+			<subNodes>
+				<subNode min="1" id="TaskInfoExportPlansNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Enable the task info export operation
+Default: &lt;i&gt;false&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="name" label="Export Plan Name" type="string" required="true" defaultValue="task_info">
+					<description>Name of the export plan</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Task Information Export description</description>
+				</attribute>
+				<attribute name="ehStatus" label="Export Event Handler Status" type="boolean" required="true" defaultValue="false"/>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Task Info Export Plan" fileNameTemplate="Files/engine/export/{@name}.comp"/>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Allows exporting information about load and export tasks</description>
+		</node>
+		<node id="TaskInfoExportPlansNode" visibleInParent="false" visible="false" generated="true" name="plans" label="Task Info Export Plan">
+			<generators>
+				
+			</generators>
+			<subNodes>
+				<subNode min="0" id="TaskInfoExportPlanNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="TaskInfoExportPlanNode" visibleInParent="false" visible="false" name="plan">
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_task_info_export_plan.xsl" fileNameTemplate="Files/engine/export/{../../@name}.comp"><!-- XSLT-based generator that stores or updates the specified plan file with the result of XSLT transformation. --><parameters>
+						<param source="../.." name="taskInfo"/>
+					</parameters>
+				</gen>
+			</generators>
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

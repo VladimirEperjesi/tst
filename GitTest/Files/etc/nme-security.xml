@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<security>
+	<audit>
+		<writers>
+			<!-- one or more audit writers -->
+			<writer class="com.ataccama.nme.engine.security.audit.ServerLoggerAuditWriter">
+				<!-- default name is "Audit" -->
+				<loggerName>NME-Auditing</loggerName>
+			</writer>
+		</writers>
+		<eventFilters>
+			<!-- one or more event filters -->
+			<eventFilter class="com.ataccama.nme.engine.security.audit.filters.BatchOpsAll" />
+
+			<eventFilter class="com.ataccama.nme.engine.security.audit.filters.ServicesByName">
+				<services>
+					<service>identifyParty</service>
+				</services>
+			</eventFilter>
+		</eventFilters>
+	</audit>
+	<authorization class="com.ataccama.nme.engine.security.auth.RoleBasedAuthorization">
+		<!-- Optional configuration, default is false -->
+		<authorizeDataServices>true</authorizeDataServices>
+		<roleValidator class="com.ataccama.nme.engine.security.auth.UmcRoleValidator" appName="MDC" createApp="true" createRoles="true"/>
+		<roles>
+			<role name="esb_r">
+				<permissions>
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ServicesAll" />
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ReadAll" />
+				</permissions>    
+			</role>
+			<role name="esb_rw">
+				<permissions>
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.WriteEntities">
+    					<entities>
+    						<entity name="party" />
+							<entity name="contact" />
+        					<entity name="address" />
+        					<entity name="id_document" />
+        					<entity name="rel_party2party" />
+    					</entities>
+					</permission>
+				</permissions>
+			</role>
+			<role name="remote">
+				<permissions>
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.BatchOpsAll" />
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ServicesByName">
+						<services>
+							<service>invoke.+</service>
+							<service>process.+</service>
+					    </services>
+					</permission>
+				</permissions>
+			</role>
+			<role name="steward">
+				<permissions>
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ServicesAll" />
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ReadEntities">
+					    <entities>
+					    	<entity name="party" layer="instance" />
+					    	<entity name="party" layer="master" masterView="masters">
+					    		<columns>
+					    		<!-- only columns listed below are visible -->
+						    		<column>cmo_type</column>
+						    		<column>cmo_first_name</column>
+						    		<column>cmo_last_name</column>
+						    		<column>cmo_gender</column>
+						    		<column>cmo_birth_date</column>
+						    		<column>cmo_sin</column>
+					    		</columns>
+					    		<conditions>
+					    			<!-- more conditions, combined by logical AND -->
+					    			<condition column="cmo_type" value="P" />
+					    		</conditions>
+    						</entity>
+    						<entity name="contact" layer="instance" />
+					    	<entity name="contact" layer="master" masterView="masters" />
+					    </entities>
+					</permission>
+				</permissions>
+			</role>
+			<role name="vip_browse">
+				<permissions>
+					<permission class="com.ataccama.nme.engine.security.auth.permissions.ReadEntities">
+						<entities>
+							<entity name="party" layer="master" masterView="masters">
+								<columns>
+									<column>cmo_company_name</column>
+						    		<column>cmo_business_number</column>
+						    		<column>cmo_established_date</column>
+						    		<column>cmo_legal_form</column>
+								</columns>
+					    		<conditions>
+					    			<!-- more conditions, combined by logical AND -->
+					    			<condition column="cmo_type" value="C" />
+					    		</conditions>
+							</entity>
+						</entities>
+					</permission>
+				</permissions>
+			</role>
+		</roles>
+	</authorization>
+</security>

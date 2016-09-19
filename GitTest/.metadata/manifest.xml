@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<manifest>
+  <name>CDI Hub</name>
+<uid>361d0778-1b96-4932-b639-48112c504382</uid>  
+<version>10.5.0.ga-2016-06-24</version>
+  <licenseOptions>
+    <option>Meta/MDM</option>
+  </licenseOptions>
+</manifest>

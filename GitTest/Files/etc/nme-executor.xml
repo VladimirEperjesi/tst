@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<executorConfig>
+	<executionPlans>
+		<!-- 
+		<plan taskId="MasterDataConsolidation">
+			<steps>
+				<step id="Cleanse(Party)" />
+				<step id="Match(Party)" />
+				<step id="Merge(Master.Party)" />
+			</steps>
+		</plan>	
+		-->
+	</executionPlans>
+	<taskListeners>
+		<!-- TaskListener capable of calling ADT Workflow -->
+		<listener class="com.ataccama.nme.ext.workflow.WorkflowTaskListener">
+		    <whenStarted>
+			    <workflowName>WF1:esb_sql_publisher.ewf</workflowName>
+			    <params>
+			      <param name="TASK_ID" expression="${TASK_ID}" />
+			      <param name="TASK_NAME" expression="${TASK_NAME}" />
+			    </params>
+		    </whenStarted>
+		</listener>
+		<!--  -->
+		<!-- TaskListener capable of calling shell command on Unix 
+		<listener class="com.ataccama.nme.engine.monitoring.ShellTaskListener">
+		    <whenSucceeded>
+		        mail -s "$TASK_NAME has finished" admin@domain.com &lt;&lt;EOT
+		        $TASK_NAME ($TASK_ID) has successfully finished.
+		EOT
+		    </whenSucceeded>
+			<whenFailed>
+				mail -s "$TASK_NAME has failed!" admin@domain.com &lt;&lt;EOT
+				$TASK_NAME ($TASK_ID) has failed.
+		EOT
+			</whenFailed>
+		</listener>
+		-->
+		<!-- TaskListener capable of calling shell command on Windows 
+		<listener class="com.ataccama.nme.engine.monitoring.ShellTaskListener">
+			<interpreter>cmd /c</interpreter>
+			<fileSuffix>.bat</fileSuffix>
+			<whenSucceeded>notepad</whenSucceeded>
+		</listener>
+		-->
+		<!--  TaskListener capable of executing SQL commands
+						 
+		<listener class="com.ataccama.nme.engine.monitoring.SqlTaskListener">
+		    <dbConnection>someDB</dbConnection>
+		    <whenSucceeded>
+				INSERT INTO TASK_LOG(id, name) VALUES(:TASK_ID, :TASK_NAME)
+		    </whenSucceeded>
+			<whenFailed>
+				INSERT INTO TASK_LOG_ERROR(id, name, message) VALUES(:TASK_ID, :TASK_NAME, :ERROR_MESSAGE)
+			</whemFailed>
+		</listener>
+		 -->
+		<!--  TaskListener capable of calling external service
+		<listener class="com.ataccama.nme.engine.monitoring.HttpSoapTaskListener">
+			<urlResourceName>name defined in *.runtimeConfig</urlResourceName>
+			<soapAction>action</soapAction>
+			<whenSucceeded>
+					<![CDATA[
+					<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://www.example.com/ws">
+						<soapenv:Header/>
+						<soapenv:Body>
+							<ws:action>
+								<ws:id>${TASK_ID}</ws:id>
+								<ws:name>${TASK_NAME}</ws:name>
+							</ws:action>
+						</soapenv:Body>
+					</soapenv:Envelope>
+					]]>
+			</whenSucceeded>
+		</listener>
+		-->
+	</taskListeners>
+</executorConfig>

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes><!-- Physical model: databases: tables --><node id="DatabaseModelNode" abstract="false" icon="icons/views.png" sortChildren="false" generated="true" name="databaseModel" label="Physical Model View">
+			<subNodes>
+				<subNode min="1" id="InstanceTablesNode" max="1"/>
+				<subNode min="1" id="MasterTablesNode" max="1"/>
+				<subNode min="1" id="RefDataTablesNode" max="1"/>
+				<subNode min="1" id="LookupTablesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="generateDoc" type="boolean" required="true" defaultValue="false"/>
+			</attributes>
+			<description>Shows both the Instance and Master Layers transformed to physical representations. Internal engine attributes are added as well. Also Reference data related entities and Lookups are shown here as a reference.&lt;br/&gt;
+Please note the Physical Model is not 100% equal to DB objects.</description>
+		</node>
+		<node id="InstanceTablesNode" inherits="TablesNode" name="instanceTables" label="Instance Tables">
+			<subNodes>
+				
+			</subNodes>
+			<description>List of tables representing MDM Physical Model of Instance Layer</description>
+		</node>
+		<node id="MasterTablesNode" inherits="TablesNode" name="masterTables" label="Master Tables">
+			<description>List of tables representing MDM Physical Model of Master Layer(s).</description>
+		</node>
+		<node id="TablesNode" icon="icons/tables.png" name="tables" label="(tables)">
+			<attributes>
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="PhysicalTable" max="-1"/>
+			</subNodes>
+			<editors>
+			</editors>
+		</node>
+		<node id="PhysicalTable" icon="icons/view.png" name="physicalTable" label="{.[ancestor::masterTables]/@layerName} {@name} ({@type})" explorerLeaf="true">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="name" label="Table Name" type="string">
+					<description>Table name</description>
+				</attribute>
+				<attribute name="layerName" type="string">
+					<description>Layer name:
+Instance
+Master
+Reference
+</description>
+				</attribute>
+				<attribute visible="false" name="customActivity" type="boolean"/>
+				<attribute visible="false" name="refData" type="string"/>
+				<attribute name="type" label="Table Type" type="string">
+					<description>Table type
+Instance
+Master
+Reference</description>
+				</attribute>
+				<attribute visible="false" name="description" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="RelationshipsNode" max="1"/>
+				<subNode min="1" id="PhysicalTableColumns" max="1"/>
+				<subNode min="1" id="VirtualColumns" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>columns/column/@name</selectPath>
+					<message>Duplicate column name!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="PhysicalTableColumns" name="columns" newTab="false" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="PhysicalTableColumn" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="PhysicalTableColumn" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="size" type="integer"/>
+				<attribute name="origin" type="string"/>
+				<attribute name="isPk" label="PK" type="boolean"/>
+				<attribute name="isFk" label="FK" type="boolean"/>
+				<attribute visible="false" name="dic" type="string"/>
+				<attribute visible="true" name="artificial" type="boolean" defaultValue="false"/>
+				<attribute name="originalPk" type="boolean" defaultValue="false"/>
+				<attribute name="originalFk" type="boolean" defaultValue="false"/>
+				<attribute name="load" type="boolean" required="true" defaultValue="true">
+					<description>&lt;ul&gt;
+&lt;li&gt;&lt;i&gt;true&lt;/i&gt;: Columns are used.
+&lt;li&gt;&lt;i&gt;false&lt;/i&gt;: Columns are never used, they are seen only here.
+&lt;/ul&gt;
+&lt;!-- 100 --&gt;</description>
+				</attribute>
+				<attribute visible="false" name="extendedSS" type="boolean" defaultValue="false"/>
+				<attribute visible="false" name="dqcType" type="string"/>
+				<attribute visible="false" name="usageValidation" type="string"/>
+				<attribute visible="false" name="refData" type="string"/>
+				<attribute visible="false" name="isSrc" type="string"/>
+				<attribute visible="false" name="instUse" type="string"/>
+				<attribute visible="false" name="eng" type="boolean" defaultValue="false"/>
+				<attribute visible="false" name="description" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="ValueDefinitionNode" max="1"/>
+				<subNode min="0" id="CompoundDefinitionNode" max="1"/>
+				<subNode min="0" id="AggregationDefinitionNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="AggregationDefinitionNode" visible="false" name="aggregationSource" label="Aggregation">
+			<attributes>
+				<attribute name="relationshipName" type="string"/>
+				<attribute name="sourceColumn" type="string"/>
+				<attribute name="method" type="string"/>
+				<attribute name="separator" type="string"/>
+				<attribute name="filterExpression" type="text"/>
+			</attributes>
+		</node>
+		<node id="RefDataTablesNode" inherits="TablesNode" name="refData" label="Reference Data Tables">
+			<description>List of tables representing MDM Physical Model of Reference Data dictionaries. It is a part of Instance Layer.</description>
+		</node>
+		<node id="ValueDefinitionNode" visible="false" name="valueDefinition" label="Value definition">
+			<attributes>
+				<attribute name="srcColumn" type="string"/>
+				<attribute name="type" type="enum" enumValues="historical,oldValue"/>
+				<attribute name="maxCnt" type="integer"/>
+				<attribute name="separator" type="string"/>
+			</attributes>
+		</node>
+		<node id="RelationshipsNode" name="relationships" newTab="true" label="Relationships" expanded="true">
+			<subNodes>
+				<subNode min="0" id="RelationshipNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="RelationshipNode" name="relationship" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="parentTable" type="string"/>
+				<attribute name="childTable" type="string"/>
+				<attribute name="parentColumn" type="string"/>
+				<attribute name="childColumn" type="string"/>
+				<attribute visible="false" name="description" type="string"/>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@parentTable=preceding-sibling::relationship/@parentTable and @childColumn=preceding-sibling::relationship/@childColumn]</expression>
+					<message>Duplicate foreign key - define alternative FK name!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="CompoundDefinitionNode" visibleInParent="false" visible="false" name="compoundDefinition">
+			<attributes>
+				
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="CompoundColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="CompoundColumnNode" name="column">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="dqcType" type="string"/>
+			</attributes>
+		</node>
+		<node id="LookupTablesNode" inherits="TablesNode" name="lookups" label="Lookups">
+			<description>List of Reference Data lookups (i.e. *.lkp files), that are used to translate source system dependent codes into master codes.</description>
+		</node>
+		<node id="VirtualColumns" visibleInParent="false" visible="false" name="virtualColumns" newTab="true" label="Virtual Columns">
+			<subNodes>
+				<subNode min="0" id="VirtualColumn" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="VirtualColumn" name="column" label="Column">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="size" type="integer"/>
+				<attribute name="origin" type="string"/>
+				<attribute name="isPk" label="PK" type="boolean"/>
+				<attribute name="isFk" label="FK" type="boolean"/>
+				<attribute visible="false" name="dqcType" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

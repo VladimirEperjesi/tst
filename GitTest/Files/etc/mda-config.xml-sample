@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mda-config>
+	<model>mda-model.gen.xml</model>
+	<!--
+	<searchBackend class="com.ataccama.mda.search.ElasticsearchNodeClient">
+		<configFile>elasticsearch-client.yml</configFile>
+		<index>mda</index>
+		<batchSize>1000</batchSize>
+	</searchBackend>
+	-->
+	<searchBackend class="com.ataccama.mda.search.ElasticsearchTransportClient">
+		<cluster>mdm_cluster_replace_me</cluster>
+		<hostname>localhost</hostname>
+		<port>9300</port>
+		<index>mda</index>
+		<batchSize>1000</batchSize>
+	</searchBackend>
+	<editLockTimeout>3600</editLockTimeout>
+	<permissions>mda-permissions.xml</permissions>
+	<!-- 
+	<authConfig class="com.ataccama.web.amc.core.auth.XmlFileAuthConfig"
+			filename="mda-auth_config.xml"/>
+	<authConfig class="com.ataccama.web.amc.jdbc.auth.JdbcDataSourceAuthConfig"
+			dataSource="umc_db" tablePrefix=""
+			appName="MDA" adminUser="admin" createRoles="true"/>
+	-->
+	<authConfig class="com.ataccama.web.amc.core.auth.UmcComponentAuthConfig"
+			appName="MDA" adminUser="admin" createRoles="true"/>
+	<auditLog class="com.ataccama.mda.core.audit.LoggerAuditLog" loggerName="audit" level="DEBUG" />
+	<jmsService name="mdaConnector" topic="mda.server.topic"/>
+</mda-config>

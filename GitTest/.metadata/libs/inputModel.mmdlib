@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes><!-- Physical model: databases: tables --><node id="InputModelNode" abstract="false" icon="icons/views.png" sortChildren="false" generated="true" name="inputModel" label="Canonical Model View" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="TablesNode" max="1"/>
+				<subNode min="1" id="RelationshipsNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.RelationEditor">
+					<tableTypes>
+						<tableType icon="icons/table.png" name="Table">
+							<tableContainerSelectorPath>tables</tableContainerSelectorPath>
+							<tableNamePath>@name</tableNamePath>
+							<columnSelectorPath>columns/column</columnSelectorPath>
+							<columnDisplayTemplate>{@name}: {@type}({@size}) {@key}</columnDisplayTemplate>
+						</tableType>
+					</tableTypes>
+					<relationshipTypes>
+						<relationshipType name="Relation">
+							<relationshipContainerSelectorPath>relationships
+					</relationshipContainerSelectorPath>
+							<relationshipNamePath>@name</relationshipNamePath>
+							<relationshipParentPath>@parentTable</relationshipParentPath>
+							<relationshipChildPath>@childTable</relationshipChildPath>
+						</relationshipType>
+					</relationshipTypes>
+				</editor>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>Shows only values from the Instance Layer (precisely L1) that are available for connected systems mapping. Mainly consists of PK, FK and src_ prefixed attributes.</description>
+		</node>
+		<node id="TablesNode" icon="icons/tables.png" name="tables" label="Tables">
+			<attributes>
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="TableNode" max="-1"/>
+			</subNodes>
+			<editors>
+			</editors>
+			<description>List of all tables on the MDM hub input</description>
+		</node>
+		<node id="TableNode" icon="icons/view.png" name="table" label="{@name}" explorerLeaf="true">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Name of the input table</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+			</subNodes>
+			<description>Name of table</description>
+		</node>
+		<node id="ColumnsNode" name="columns" newTab="false" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ColumnNode" max="-1"/>
+			</subNodes>
+			<description>Input columns definition</description>
+		</node>
+		<node id="ColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Attribute name</description>
+				</attribute>
+				<attribute name="type" label="Type" type="string">
+					<description>Attribute data type</description>
+				</attribute>
+				<attribute name="size" label="Size" type="integer">
+					<description>Size of an attribute</description>
+				</attribute>
+				<attribute name="isPk" label="Primary Key" type="boolean" required="true">
+					<description>Name of attribute comprising the primary key in the parent table</description>
+				</attribute>
+				<attribute name="isFk" label="Foreign Key" type="string" required="true">
+					<description>Name of attribute comprising the foreign key in the child table </description>
+				</attribute>
+				<attribute visible="false" name="key" type="string"/>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			
+			
+			</subNodes>
+			<description>Input column definition</description>
+		</node>
+		<node id="RelationshipsNode" name="relationships" label="Relationships">
+			<subNodes>
+				<subNode min="0" id="RelationshipNode" max="-1"/>
+			</subNodes>
+			<description>Relationships between input tables</description>
+		</node>
+		<node id="RelationshipNode" name="relationship" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Name of the relationship</description>
+				</attribute>
+				<attribute name="parentTable" label="Parent Table" type="string">
+					<description>Independent entity (e.g. customer)</description>
+				</attribute>
+				<attribute name="childTable" label="Child Table" type="string">
+					<description>Dependent entity (e.g. contact)</description>
+				</attribute>
+				<attribute name="parentColumn" label="Parent Column" type="string">
+					<description>Name of attribute comprising the primary key in the parent table</description>
+				</attribute>
+				<attribute name="childColumn" label="Child Column" type="string">
+					<description>Name of attribute comprising the foreign key in the child table</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>Input relationship</description>
+		</node>
+	</nodes>
+</metametadata-library>

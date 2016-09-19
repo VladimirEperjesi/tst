@@ -1,0 +1,849 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="EventHandlerSettingsNode" icon="icons/document_out.png" name="eventHandler" newTab="false" label="Event Handler Settings" explorerLeaf="false">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="handlers" class="com.ataccama.ame.core.editors.CreateChild" label="New Event Handler Definition">
+		
+		</editor>
+			</editors>
+			<subNodes>
+				<subNode min="1" id="EventHandlersNode" max="1"/>
+				<subNode min="1" id="metaColumnsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gen_event_handler_xml.xsl" fileNameTemplate="Files/etc/nme-event_handler.gen.xml"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+			</parameters>
+				</gen>
+			</generators>
+			<description>Allows configuring on-demand batch exports from the MDM Hub (exports are fully served by the NME Engine) and processing-based data changes handled via Event Handler and Publisher</description>
+		</node>
+		<node id="EventHandlersNode" name="handlers" label="Event Handlers" expanded="true">
+			<subNodes>
+				<subNode min="0" id="EventHandlerNode" max="-1"/>
+			</subNodes><!--Tabs for Event Handler/General ???--><description>Event Handler setting. It captures and stores data changes from the &amp;lt;i&amp;gt;Master Data Consolidation&amp;lt;/i&amp;gt; process.</description>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>handler[@enable=&#39;true&#39;]/@name</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;name&#39;</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>handler[@enable=&#39;true&#39;]/@persistenceDir</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;persistenceDir&#39;</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="EventHandlerNode" icon="icons/document_out.png" name="handler" label="{@class}:{@desc}" explorerLeaf="false">
+			<attributes>
+				<attribute name="class" label="Class" type="enum" required="true" enumValues="EventHandlerAsync" defaultValue="EventHandlerAsync">
+					<description>Specific Event Handler implementation</description>
+				</attribute>
+				<attribute name="name" label="Name" type="string" required="false">
+					<description>Optional element name for distinguish Event Handlers.</description>
+				</attribute>
+				<attribute name="desc" label="Description" type="string">
+					<description>Event Handler description</description>
+				</attribute>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="true">
+					<description>Allows turning the Event Handler generation off. Event handler and all defined Publishers are not a part of the MDM hub configuration.</description>
+				</attribute>
+				<attribute name="persistenceDir" label="Persistence Directory" type="folder" defaultValue="../storage/eventHandler">
+					<description>Target directory path for Events captured by Event Handler. All persisted data will be stored here until they are published</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="PublishersNode" max="1"/>
+				<subNode min="1" id="FilterNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Event Handler Definition"/>
+				<editor targetNodePath="./publishers" class="com.ataccama.ame.core.editors.CreateChild" label="New Publisher ...">
+		</editor>
+			</editors>
+			<description>Event Handler setting</description><!--Tabs for Event Handler/General--></node>
+		<node id="PublishersNode" sortChildren="false" name="publishers" newTab="true" label="Publishers" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractPublisherClassNode" max="-1"/>
+			</subNodes><!--Tabs for Event Handler/Publisher--><description>Event Publisher definition. It sends data changes to defined consumers via various channels.</description>
+			<editors>
+				
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>eventPlanPublisher/cc/@planName</selectPath>
+					<message>Event Plan Publisher has not unique name for plan. Define suffix for unique.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="EntitiesNode" name="entities" label="Filtered Entities" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="EntityNode" max="-1"/>
+			</subNodes>
+			<description>List of Entities registered in Event Handler. These Entities will be monitored for data changes</description>
+		</node>
+		<node id="EntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Name of the entity monitored by Event Handler</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/instanceTables/physicalTable|/logicalModel/masterModels/masterModel/masterTables/masterTable[@name!=/logicalModel/instanceModel/tables/table/@name]|/preview/databaseModel/refData/physicalTable</selectPath>
+						<valueTemplate>{lower-case(@name)} ({tokenize(@type,&#39;_&#39;,1)|../../@name})</valueTemplate>
+						<labelTemplate>{lower-case(@name)} ({@type|../../@name})</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute visible="true" name="expression" label="Filter Expression" type="expression" required="false" extendable="true">
+					<description>Filter expression where old, new and also metadata entity columns can be evaluated. These are available through dot-source meta.
+e.g. new.src_name != old.src_name and meta.event_type=&#39;UPDATE&#39;</description>
+					<expressionProvider class="com.ataccama.ame.core.expressions.ExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+							<source dotSource="old" name="old">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::entity/cc/@entityName) and @layerName=lower-case($current/ancestor::entity/cc/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{@name}.{@type}</labelTemplate>
+							</source>
+							<source dotSource="new" name="new">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::entity/cc/@entityName) and @layerName=lower-case($current/ancestor::entity/cc/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{@name}.{@type}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+				</attribute>
+			</attributes>
+			<validations>
+			
+			</validations>
+			<subNodes>
+				<subNode min="1" id="ccEntityNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="AbstractPublisherClassNode" abstract="true" icon="icons/upload.png" sortChildren="false" name="class" label="Class" expanded="false">
+			<attributes>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="true">
+					<description>Allows turning the Publisher generation off. This Publishers is not a part of the MDM hub configuration.</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Publisher description</description>
+				</attribute>
+			</attributes>
+			<description>Basic setting that is unique for each publisher. Usually there is a definition of an output. </description>
+			<subNodes>
+				
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Publisher"/>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>eventPlanPublisher/@name</selectPath>
+					<message>&#39;{.}&#39; is not unique value for attribute &#39;name&#39;</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="ISMPublisherNode" inherits="AbstractPublisherClassNode" name="ismPublisher" label="iSM Publisher">
+			<attributes>
+				<attribute name="host" label="Host" type="string" required="true">
+					<description>Target host
+For example &#39;localhost&#39;</description>
+				</attribute>
+				<attribute name="port" label="Port" type="integer" required="true">
+					<description>Target port
+For example &#39;8888&#39;</description>
+				</attribute>
+				<attribute name="targetSystem" label="Target System" type="string" required="true">
+					<description>The &quot;targetSystem&quot; property in the message. This property is a template of general nested DQC expressions.</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+			</subNodes>
+			<description>Compiles a XML message from each Event it receives and sends it separately to a specified host and port</description>
+			<editors>
+				
+			</editors>
+		</node>
+		<node id="EventSQLPublisherNode" inherits="AbstractPublisherClassNode" name="eventSqlPublisher" label="Event SQL Publisher">
+			<attributes>
+				<attribute name="dataSource" label="Data Source" type="string" required="true">
+					<description>Specifies the MDM hub data source: a named database connection defined in server configuration</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" severity="info">
+						<selectPath>/dataSources/dataSource/@name</selectPath>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="EventSQLPublisherTemplatesNode" max="1"/>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+			</subNodes>
+			<description>This type of publisher executes a SQL statement on a database</description>
+			<editors>
+				
+			</editors>
+		</node>
+		<node id="EventSQLPublisherTemplatesNode" name="sqlTemplates" label="Templates" expanded="true">
+			<subNodes>
+				<subNode min="0" id="EventSQLPublisherTemplateNode" max="-1"/>
+			</subNodes>
+			<description>Unlike other publishers, SQL publisher doesn&#39;t feature a transformer for creating target text messages. Instead, a set of SQL-specific templates is used to create SQL statements directly. This increases the performance of the publishing considerably. SQL templates have some additional constraints over the common templates: they only allow binding DQC expressions to SQL variables. They do not allow changing the SQL statement itself</description>
+		</node>
+		<node id="EventSQLPublisherTemplateNode" name="template" label="Template of {../..}">
+			<attributes>
+				<attribute name="name" label="Entity name" type="string" required="true">
+					<description>Declares the entity that flows into the template</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel[count($current/ancestor::handler/filter/entities/entity)=0]/tables/table|/logicalModel/instanceModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/tables/table[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(instance)&#39;,&#39; &#39;)]|/logicalModel/instanceModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/dicTables/table[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(dictionary)&#39;,&#39; &#39;)]|/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)=0]/masterTables/masterTable[lower-case(@name)!=lower-case(/logicalModel/instanceModel/tables/table/@name)]|/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/masterTables/masterTable[lower-case($current/ancestor::handler/filter/entities/entity/@name) = string-join(string-join(string-join(lower-case(@name),&#39;(&#39;,&#39; &#39;),lower-case(ancestor::masterModel/@name),&#39;&#39;),&#39;)&#39;,&#39;&#39;)]
+	|/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)=0]/physicalTable
+	|/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)&gt;0]/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(master)&#39;,&#39; &#39;) or lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(translation)&#39;,&#39; &#39;)]
+	</selectPath>
+						<valueTemplate>{lower-case(@name)} ({@type|../../@name})</valueTemplate>
+						<labelTemplate>{lower-case(@name)} ({@type|../../@name})</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="template" label="Template" type="expression" required="true" defaultValue="insert into TABLE values (${new.src_name}, ${old.src_name})" extendable="true">
+					<description>SQL template used for publishing events into a database</description>
+					<expressionProvider class="com.ataccama.ame.core.expressions.SemiExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+							<source dotSource="old" name="old">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::template/cc/@entityName) and @layerName=lower-case($current/ancestor::template/cc/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+							<source dotSource="new" name="new">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::template/cc/@entityName) and @layerName=lower-case($current/ancestor::template/cc/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+				</attribute>
+			</attributes>
+			<validations>
+				
+			</validations>
+			<subNodes>
+				<subNode min="1" id="ccPublisherNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="JMSpublisherNode" inherits="AbstractPublisherClassNode" name="jmsPublisher" label="Event JMS Publisher">
+			<attributes>
+				<attribute name="connectionName" label="Connection Name" type="string" required="true">
+					<description>Name of the JMS connection configured in server configuration</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" severity="info">
+						<selectPath>/servers/jmsServer/@name</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="destination" label="Destination" type="string" required="true">
+					<description>Target queue or topic</description>
+				</attribute>
+				<attribute name="contentType" label="Content Type" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>.</selectPath>
+						<staticValues>
+							<entry value="text/xml" label="text/xml"/>
+							<entry value="text/plain" label="text/plain"/>
+						</staticValues>
+					</valuesProvider>
+					<description>This option sets the info header of content type. Default value is &lt;kbd&gt;text/plain&lt;/kbd&gt;</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="HeadersNode" max="1"/>
+				<subNode min="1" id="TransformersNode" max="1"/>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+			</subNodes>
+			<description>This publisher sends the message through Java Message Service</description>
+			<editors>
+				
+			</editors>
+		</node>
+		<node id="FilterNode" name="filter" label="Filter" expanded="true">
+			<subNodes>
+				<subNode min="1" id="EntitiesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute height="10" name="expression" label="General Filter Expression" type="expression" extendable="true">
+					<expressionProvider class="com.ataccama.ame.core.expressions.ExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider><!-- 
+				<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+	<selectPath>.</selectPath>
+	<staticValues>
+         <entry value="meta.id" label="meta.id (LONG)"/>
+         <entry value="meta.event_type" label="meta.event_type (STRING)"/>
+         <entry value="meta.entity" label="meta.entity (STRING)"/>
+         <entry value="meta.layer" label="meta.layer (STRING)"/>
+         <entry value="meta.master_view" label="meta.master_view (STRING)"/>
+         <entry value="meta.origin" label="meta.origin (STRING)"/>
+         <entry value="meta.source_system" label="meta.source_system (STRING)"/>
+         <entry value="meta.activation_date" label="meta.activation_date (DAY)"/>
+         <entry value="meta.creation_date" label="meta.creation_date (DAY)"/>
+         <entry value="meta.deactivation_date" label="meta.deactivation_date (DAY)"/>
+         <entry value="meta.deletion_date" label="meta.deletion_date (DAY)"/>
+         <entry value="meta.last_update_date" label="meta.last_update_date (DAY)"/>
+         <entry value="meta.activation_tid" label="meta.activation_tid (LONG)"/>
+         <entry value="meta.creation_tid" label="meta.creation_tid (LONG)"/>
+         <entry value="meta.deactivation_tid" label="meta.deactivation_tid (LONG)"/>
+         <entry value="meta.deletion_tid" label="meta.deletion_tid (LONG)"/>
+         <entry value="meta.last_update_tid" label="meta.last_update_tid (LONG)"/>
+    </staticValues>
+</valuesProvider>--><description>Use this expression to pre-select Events (only metadata columns are available for filtering)</description>
+				</attribute>
+			</attributes>
+			<description>Filter can be applied on Events produced by Event Handler. It is useful to reduce the volume of captured events</description>
+		</node>
+		<node id="HttpSoapPublisherNode" inherits="AbstractPublisherClassNode" name="httpSoapPublisher" label="HTTP SOAP Publisher">
+			<attributes>
+				<attribute name="urlResourceName" label="URL Resource Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" severity="info">
+						<selectPath>/servers/genericServer/@name</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="soapAction" label="SOAP Action" type="string" required="true" defaultValue="SOAP_ACTION">
+					<description>Soap Action definition</description>
+				</attribute>
+				<attribute name="soapVersion" label="SOAP version" type="enum" enumValues="SOAP_1_1,SOAP_1_2" defaultValue="SOAP_1_1">
+					<description>Optional entry, defaulting to SOAP 1.1. Allowed values are &lt;kbd&gt;SOAP_1_1&lt;/kbd&gt; and &lt;kbd&gt;SOAP_1_2&lt;/kbd&gt;</description>
+				</attribute>
+				<attribute name="timeout" label="Timeout (ms)" type="integer">
+					<description>Optional entry, default value is 5000 ms</description>
+				</attribute>
+				<attribute name="encoding" label="Encoding" type="string">
+					<description>Optional entry, default value is UTF-8</description>
+				</attribute>
+				<attribute name="delay" label="Delay between requests (ms)" type="integer">
+					<description>Optional entry, default value is 0 ms</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+				<subNode min="1" id="TransformersNode" max="1"/>
+			</subNodes>
+			<description>The publisher constructs a SOAP message and then sends it through HTTP protocol to a specified destination</description>
+			<editors>
+				
+			</editors>
+		</node>
+		<node id="TransformersNode" name="transformers" label="Transformers" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractTransformerNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[count(simpleXmlTransformer)&gt;1]</expression>
+					<message>Only one Simple XML Transformer can be defined!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[simpleXmlTransformer and expressionTemplateTransformer]</expression>
+					<message>Simple XML Transformer cannot be combined with any other transformers!</message>
+				</validation>
+			</validations>
+			<description>Definition of output message format.</description>
+		</node>
+		<node id="FilteringPublisherNode" name="filteringPublisher" newTab="false" label="Filter Incoming Events Setting" expanded="true">
+			<subNodes>
+				<subNode min="1" id="FilteringEntitiesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="filter" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Turn the following advanced filters on for the Publisher </description>
+				</attribute>
+				<attribute name="expression" label="General Filter Expression" type="expression">
+					<expressionProvider class="com.ataccama.ame.core.expressions.ExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider><!-- 				
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+					<selectPath>.</selectPath>
+						<staticValues>
+         <entry value="meta.id" label="meta.id (LONG)"/>
+         <entry value="meta.event_type" label="meta.event_type (STRING)"/>
+         <entry value="meta.entity" label="meta.entity (STRING)"/>
+         <entry value="meta.layer" label="meta.layer (STRING)"/>
+         <entry value="meta.master_view" label="meta.master_view (STRING)"/>
+         <entry value="meta.origin" label="meta.origin (STRING)"/>
+         <entry value="meta.source_system" label="meta.source_system (STRING)"/>
+         <entry value="meta.activation_date" label="meta.activation_date (DAY)"/>
+         <entry value="meta.creation_date" label="meta.creation_date (DAY)"/>
+         <entry value="meta.deactivation_date" label="meta.deactivation_date (DAY)"/>
+         <entry value="meta.deletion_date" label="meta.deletion_date (DAY)"/>
+         <entry value="meta.last_update_date" label="meta.last_update_date (DAY)"/>
+         <entry value="meta.activation_tid" label="meta.activation_tid (LONG)"/>
+         <entry value="meta.creation_tid" label="meta.creation_tid (LONG)"/>
+         <entry value="meta.deactivation_tid" label="meta.deactivation_tid (LONG)"/>
+         <entry value="meta.deletion_tid" label="meta.deletion_tid (LONG)"/>
+         <entry value="meta.last_update_tid" label="meta.last_update_tid (LONG)"/>
+    </staticValues>
+</valuesProvider>
+
+--><description>Use this expression to pre-select Events (only metadata columns are available for filtering)</description>
+				</attribute>
+			</attributes>
+			<description>Configuration enables filtering the flow of incoming events</description>
+		</node>
+		<node id="RetryingPublisherNode" name="retryingPublisher" newTab="false" label="Retry Publishing Settings" expanded="true">
+			<attributes>
+				<attribute name="retry" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Turn the following Retrying functionality on for the Publisher</description>
+				</attribute>
+				<attribute name="globalRetries" label="Global Retries" type="integer" defaultValue="5">
+					<description>The initial number of retries. This number can change during Event publishing according to successful/failed attempts.</description>
+				</attribute>
+				<attribute name="retryDelay" label="Retry Delay (sec.)" type="integer" defaultValue="20">
+					<description>The delay after a failed attempt to publish an event before a retry (in seconds)</description>
+				</attribute>
+				<attribute name="consecutiveSuccess" label="Consecutive Success Granting Retry" type="integer" defaultValue="10">
+					<description>Number of consecutive successful publications that will add 1 retry to global retries; 0 means no new retries will be added. The top limit for retries can be configured.</description>
+				</attribute>
+				<attribute name="maxRetries" label="Maximum Retries" type="integer" defaultValue="30">
+					<description>The maximum limit of retries. Number of &lt;b&gt;actual retries can change&lt;/b&gt; according to successful/failed event publication</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			</subNodes>
+			<description>Configure the possibility to retry a failed attempt to publish an event</description>
+		</node>
+		<node id="AdvancedSettingsNode" name="advanced" newTab="true" label="Advanced Settings" expanded="true">
+			<subNodes>
+				<subNode min="1" id="FilteringPublisherNode" max="1"/>
+				<subNode min="1" id="RetryingPublisherNode" max="1"/>
+			</subNodes>
+			<attributes>
+				
+			
+			</attributes>
+			<description>Setting of additional filtering possibilities and retries of publishing in case of failure.</description><!--Tabs for <publisher>/Advanced Settings--></node>
+		<node id="FilteringEntitiesNode" name="filteredEntities" label="Filtered Entities" explorerLeaf="false" expanded="true">
+			<subNodes>
+				<subNode min="0" id="FilteringEntityNode" max="-1"/>
+			</subNodes>
+			<description>List of filtered entities. Data changes of these entities will be published.</description>
+		</node>
+		<node id="FilteringEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Name of the published entity</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)=0]/instanceTables/physicalTable|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/instanceTables/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(instance)&#39;,&#39; &#39;)]|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/instanceTables/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(dictionary)&#39;,&#39; &#39;)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)=0]/masterTables/masterTable[lower-case(@name)!=lower-case(/logicalModel/instanceModel/tables/table/@name)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/masterTables/masterTable[lower-case($current/ancestor::handler/filter/entities/entity/@name) = string-join(string-join(string-join(lower-case(@name),&#39;(&#39;,&#39; &#39;),lower-case(ancestor::masterModel/@name),&#39;&#39;),&#39;)&#39;,&#39;&#39;)]
+	|/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)=0]/physicalTable
+	|/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)&gt;0]/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(master)&#39;,&#39; &#39;) or lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(translation)&#39;,&#39; &#39;)]
+
+	</selectPath>
+						<valueTemplate>{lower-case(@name)} ({lower-case(tokenize(@type,&#39;_&#39;,1))|lower-case(../../@name)})</valueTemplate>
+						<labelTemplate>{lower-case(@name)} ({lower-case(@type)|lower-case(../../@name)})</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="expression" label="Filter Expression" type="expression">
+					<description>Filter expression where old, new and also metadata entity columns can be evaluated. These are available through dot-source meta.
+e.g. new.src_name != old.src_name and meta.event_type=&#39;UPDATE&#39;</description>
+					<expressionProvider class="com.ataccama.ame.core.expressions.ExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+							<source dotSource="old" name="old">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=$current/ancestor::entity/ccf/@entityName and @layerName=$current/ancestor::entity/ccf/@layerName]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+							<source dotSource="new" name="new">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=$current/ancestor::entity/ccf/@entityName and @layerName=$current/ancestor::entity/ccf/@layerName]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ccFilteringEntityNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ExpressionTemplateTransformerNode" inherits="AbstractTransformerNode" name="expressionTemplateTransformer" label="Expression Template">
+			<attributes>
+				<attribute name="entityName" label="Entity Name" type="string" required="true">
+					<description>Declares the entity that flows into this transformer</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true"><!-- not working
+	<selectPath>
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)=0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/instanceTables/physicalTable|
+		/preview/databaseModel[count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)&gt;0]/instanceTables/physicalTable[$current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity/@name= string-join(@name,&#39;(instance)&#39;,&#39; &#39;)]|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/instanceTables/physicalTable[$current/ancestor::handler/filter/entities/entity/@name= string-join(@name,&#39;(instance)&#39;,&#39; &#39;)]|
+		/preview/databaseModel[count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)&gt;0]/instanceTables/physicalTable[$current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity/@name= string-join(@name,&#39;(dictionary)&#39;,&#39; &#39;)]|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/instanceTables/physicalTable[$current/ancestor::handler/filter/entities/entity/@name= string-join(@name,&#39;(dictionary)&#39;,&#39; &#39;)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)=0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/masterTables/masterTable[@name!=/logicalModel/instanceModel/tables/table/@name]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)&gt;0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/masterTables/masterTable[$current/ancestor::handler/filter/entities/entity/@name = string-join(string-join(string-join(@name,&#39;(&#39;,&#39; &#39;),ancestor::masterModel/@name,&#39;&#39;),&#39;)&#39;,&#39;&#39;)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)&gt;0]/masterTables/masterTable[$current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity/@name = string-join(string-join(string-join(@name,&#39;(&#39;,&#39; &#39;),ancestor::masterModel/@name,&#39;&#39;),&#39;)&#39;,&#39;&#39;)]
+		|
+		/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)=0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/physicalTable
+		|
+		/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)&gt;0 and count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)=0]/physicalTable[$current/ancestor::handler/filter/entities/entity/@name=string-join(@name,&#39;(master_rd)&#39;,&#39; &#39;) or $current/ancestor::handler/filter/entities/entity/@name=string-join(@name,&#39;(translation)&#39;,&#39; &#39;)]
+		|
+		/preview/databaseModel/refData[count($current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity)&gt;0]/physicalTable[$current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity/@name=string-join(@name,&#39;(master_rd)&#39;,&#39; &#39;) or $current/ancestor::*/advanced/filteringPublisher/filteredEntities/entity/@name=string-join(@name,&#39;(translation)&#39;,&#39; &#39;)]
+	</selectPath>--><selectPath>/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)=0]/instanceTables/physicalTable|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/instanceTables/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(instance)&#39;,&#39; &#39;)]|
+		/preview/databaseModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/instanceTables/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)= string-join(lower-case(@name),&#39;(dictionary)&#39;,&#39; &#39;)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)=0]/masterTables/masterTable[lower-case(@name)!=lower-case(/logicalModel/instanceModel/tables/table/@name)]|
+		/logicalModel/masterModels/masterModel[count($current/ancestor::handler/filter/entities/entity)&gt;0]/masterTables/masterTable[lower-case($current/ancestor::handler/filter/entities/entity/@name) = string-join(string-join(string-join(lower-case(@name),&#39;(&#39;,&#39; &#39;),lower-case(ancestor::masterModel/@name),&#39;&#39;),&#39;)&#39;,&#39;&#39;)]|
+		/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)=0]/physicalTable|
+		/preview/databaseModel/refData[count($current/ancestor::handler/filter/entities/entity)&gt;0]/physicalTable[lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(master)&#39;,&#39; &#39;) or lower-case($current/ancestor::handler/filter/entities/entity/@name)=string-join(lower-case(@name),&#39;(translation)&#39;,&#39; &#39;)]
+
+	</selectPath>
+						<valueTemplate>{lower-case(@name)} ({tokenize(@type,&#39;_&#39;,1)|../../@name})</valueTemplate>
+						<labelTemplate>{lower-case(@name)} ({@type|../../@name})</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="template" label="Template" type="expression" required="true" extendable="true">
+					<description>The intended text with the nested DQC expressions. 
+Example: 
+Some text with ${&#39;DQC expressions&#39;} inside it.
+Since the expressions are part of a string, they have to be of a STRING type. This includes converting any columns of a non-string type to string (by toString() DQC function) if necessary.</description>
+					<expressionProvider class="com.ataccama.ame.core.expressions.SemiExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+							<source dotSource="old" name="old">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::expressionTemplateTransformer/cct/@entityName) and @layerName=lower-case($current/ancestor::expressionTemplateTransformer/cct/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+							<source dotSource="new" name="new">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::expressionTemplateTransformer/cct/@entityName) and @layerName=lower-case($current/ancestor::expressionTemplateTransformer/cct/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ccTemplateNode" max="1"/>
+			</subNodes>
+			<description>A transformer based on a template</description>
+		</node>
+		<node id="StdOutPublisherNode" inherits="AbstractPublisherClassNode" name="stdOutPublisher" label="Standard Output Publisher">
+			<subNodes>
+				<subNode min="1" id="TransformersNode" max="1"/>
+				<subNode min="1" id="AdvancedSettingsNode" max="1"/>
+			</subNodes>
+			<description>This type of publisher shows the changes in Standard Output. Useful mainly for demo and debug purposes.</description>
+			<editors>
+				
+			</editors>
+		</node>
+		<node id="HeadersNode" name="headers" label="JMS Properties" expanded="true">
+			<description>Set of headers for the JMS messages</description>
+			<subNodes>
+				<subNode min="0" id="HeaderNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="HeaderNode" name="header" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>JMS property name</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>JMS property value</description>
+				</attribute>
+				<attribute name="type" label="Type" type="enum" required="true" enumValues="STRING,INT,LONG,BOOLEAN" defaultValue="STRING">
+					<description>JMS property data type</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>JMS property name {.} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="AbstractTransformerNode" abstract="true" name="transformer" label="{@name}">
+			<attributes>
+				<attribute name="name" columnWidth="10" label="Description" type="string">
+					<description>Transformer Description</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			
+			</subNodes>
+		</node>
+		<node id="SimpleXmlTransformerNode" inherits="AbstractTransformerNode" name="simpleXmlTransformer" label="Simple XML">
+			<attributes>
+				<attribute name="indent" label="Indent" type="boolean" required="true" defaultValue="true">
+					<description>If true (default) XML is formatted - indented using tabs (\\t).</description>
+				</attribute>
+				<attribute name="includeOldValues" label="Include Old Values" type="boolean" required="true" defaultValue="true">
+					<description>If true (default) XML contains old values of attributes</description>
+				</attribute>
+			</attributes>
+			<description>Transforms events to simple predefined XML. It does not require nor provide any template configuration</description>
+		</node>
+		<node id="ccEntityNode" sortChildren="false" visible="false" generated="true" name="cc">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="ccFilteringEntityNode" sortChildren="false" visible="false" generated="true" name="ccf">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="ccTemplateNode" sortChildren="false" visible="false" generated="true" name="cct">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="ccPublisherNode" sortChildren="false" visible="false" generated="true" name="cc">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="metaColumnsNode" visible="false" generated="true" name="metaColumns" explorerLeaf="true">
+			<subNodes>
+				<subNode min="0" id="metaColumnNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="EventPlanPublisherNode" inherits="AbstractPublisherClassNode" name="eventPlanPublisher" label="Event Plan Publisher ({entityName/@entity} {@layerName}, {@suffix})" explorerLeaf="true">
+			<attributes>
+				<attribute name="suffix" label="Suffix" type="string" required="false">
+					<description>Optional attribute that is used to differentiate more Plan Publishers with same Layer Name and Entity.
+Note: For better plan name readability, use underscore at the begginig of suffix!
+&lt;!-- 1050 --&gt;</description>
+				</attribute>
+				<attribute name="layerName" label="Layer Name" type="list">
+					<description>Master Layer name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/masterModels/masterModel</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+						<staticValues>
+							<entry value="instance" label="instance"/>
+						</staticValues>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="PlanAdvancedSettingsNode" max="1"/>
+				<subNode min="1" id="EntityNameNode" max="1"/>
+				<subNode min="1" id="ColumnsMetaNode" max="1"/>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+				<subNode min="1" id="ccPlanName" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_eventPlanPublisherPlan.xsl" fileNameTemplate="Files/engine/events/ep_{@layerName}_{entityName/@entity}{@suffix}.comp">
+					<parameters>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+						<param source="/outputOperations/eventHandler" name="eventHandler"/>
+					</parameters>
+				</gen>
+			</generators>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/events/ep_{@layerName}_{entityName/@entity}{@suffix}.comp"/>
+			</editors>
+			<description>This publisher sends the output to the standard plan and the further data flow can be handled in custom way.
+&lt;!-- 1000 and below--&gt;</description>
+		</node>
+		<node id="ColumnsNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ColumnNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[$current/ancestor::eventPlanPublisher/entityName/@allColumns=&#39;true&#39; and column]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[not(column) and $current/ancestor::eventPlanPublisher/entityName/@allColumns=&#39;false&#39;]</expression>
+					<message>Option &quot;All Columns&quot; disabled. Select columns from the list or enable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>Selected columns node.</description>
+		</node>
+		<node id="ColumnNode" name="column" label="Column">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+    /preview/databaseModel/masterTables/physicalTable[@layerName=lower-case($current/ancestor::eventPlanPublisher/@layerName) and @name=lower-case($current/ancestor::eventPlanPublisher/entityName/@entity)]/columns/column[@name!=&quot;id&quot;]  
+    |/preview/databaseModel/instanceTables/physicalTable[$current/ancestor::eventPlanPublisher/@layerName=&#39;instance&#39; and @name=lower-case($current/ancestor::eventPlanPublisher/entityName/@entity)]/columns/column
+    </selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Name of column to be available in the plan.&lt;br/&gt;
+Please note, the final column name is always extended by &lt;i&gt;old_&lt;/i&gt; or &lt;i&gt;new_&lt;/i&gt; prefix (based on Old and New Value configuration)</description>
+				</attribute>
+				<attribute name="old" label="Old Value" type="boolean" required="false" defaultValue="true">
+					<description>The &lt;i&gt;old_&lt;/i&gt; prefixed column is added into the plan</description>
+				</attribute>
+				<attribute name="new" label="New Value" type="boolean" required="false" defaultValue="true">
+					<description>The &lt;i&gt;new_&lt;/i&gt; prefixed column is added into the plan</description>
+				</attribute>
+			</attributes>
+			<description>Column name</description>
+		</node>
+		<node id="metaColumnNode" name="metaColumn">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+			</attributes>
+		</node>
+		<node id="ColumnsMetaNode" name="columnsMeta" label="Meta Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ColumnMetaNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[$current/ancestor::eventPlanPublisher/entityName/@allColumns=&#39;true&#39; and columnMeta]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>Selected meta columns node.</description>
+		</node>
+		<node id="ColumnMetaNode" name="columnMeta" label="Meta Column">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+						<valueTemplate>meta_{@name}</valueTemplate>
+						<labelTemplate>meta_{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Column name</description>
+				</attribute>
+			</attributes>
+			<description>Selected Meta-column name </description>
+		</node>
+		<node id="EntityNameNode" name="entityName" label="Entity Name (Press Apply to reload entities)" expanded="true">
+			<attributes>
+				<attribute name="entity" label="Entity" type="list">
+					<description>Entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/instanceModel[$current/ancestor::eventPlanPublisher/@layerName=&#39;instance&#39;]/tables/table
+    	|/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/ancestor::eventPlanPublisher/@layerName)]/masterTables/masterTable
+    	<!-- |/logicalModel/masterModels/masterModel[@name=$current/ancestor::eventPlanPublisher/@layerName]/instanceTables/instanceTable -->
+    	</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="false">
+					<description>Select all columns. &lt;br/&gt;
+Please note, that all &lt;i&gt;meta columns/i&gt; and both &lt;i&gt;old_&lt;/i&gt; and &lt;i&gt;new_&lt;/i&gt; prefixed columns will be available in the plan</description>
+				</attribute>
+			</attributes>
+			<description>Name of the selected entity for the Plan Publisher</description>
+		</node>
+		<node id="PlanAdvancedSettingsNode" name="planAdvancedSettings" newTab="true" label="Advanced Settings" expanded="true">
+			<subNodes>
+				<subNode min="1" id="PlanFilteringPublisherNode" max="1"/>
+				<subNode min="1" id="RetryingPublisherNode" max="1"/>
+			</subNodes>
+			<description>Setting of additional filtering possibilities and retries of publishing in case of failure.</description>
+		</node>
+		<node id="PlanFilteringPublisherNode" name="planFilteringPublisher" label="Filter Incoming Events Setting" expanded="true">
+			<description>Configuration enables filtering the flow of incoming events</description>
+			<attributes>
+				<attribute name="filter" label="Enable" type="boolean" required="true" defaultValue="false">
+					<description>Turn the following advanced filters on for the Publisher</description>
+				</attribute>
+				<attribute name="expression" label="Filter Expression" type="expression">
+					<description>Use this expression to pre-select Events</description>
+					<expressionProvider class="com.ataccama.ame.core.expressions.ExpressionPathValuesProvider">
+						<sources>
+							<source dotSource="meta" name="meta">
+								<selectPath>/outputOperations/eventHandler/metaColumns/metaColumn</selectPath>
+								<nameTemplate>{@name}</nameTemplate>
+								<dataTypeTemplate>{@type}</dataTypeTemplate>
+								<labelTemplate>{@name} ({@type})</labelTemplate>
+							</source>
+							<source dotSource="old" name="old">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::planFilteringPublisher/ccp/@entityName) and @layerName=lower-case($current/ancestor::planFilteringPublisher/ccp/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+							<source dotSource="new" name="new">
+								<selectPath>/preview/databaseModel/*/physicalTable[@name=lower-case($current/ancestor::planFilteringPublisher/ccp/@entityName) and @layerName=lower-case($current/ancestor::planFilteringPublisher/ccp/@layerName)]/columns/column[@name!=&#39;&#39;]</selectPath>
+								<nameTemplate>{lower-case(@name)}</nameTemplate>
+								<dataTypeTemplate>{@dqcType}</dataTypeTemplate>
+								<labelTemplate>{lower-case(@schema)}.{lower-case(@name)}</labelTemplate>
+							</source>
+						</sources>
+					</expressionProvider>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ccPlanFilteringEntityNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ccPlanFilteringEntityNode" visibleInParent="true" sortChildren="false" visible="false" generated="true" name="ccp">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="ccPlanName" visible="false" generated="true" name="cc">
+			<attributes>
+				<attribute name="planName" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

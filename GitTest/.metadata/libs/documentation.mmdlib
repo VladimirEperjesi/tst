@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="documentationRoot" icon="icons/folder2_red.png" generated="false" name="documentationRoot" label="Documentation">
+			<subNodes>
+				<subNode min="1" id="DocumentationNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator"/>
+			</generators>
+			<attributes>
+				<attribute name="calculateDoc" type="boolean" required="true" defaultValue="false"/>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>On-demand generated HTML documentation displays contents of the current MDM Hub configuration. It lists all entities, attributes, relationships, etc. Documentation content is automatically recompiled with model changes if it is enabled.</description>
+		</node>
+		<node id="GuiDocumentationNode" visibleInParent="false" icon="icons/document_text.png" visible="false" generated="false" name="guiDocumentation" label="GUI Documentation" explorerLeaf="true">
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" fileNameTemplate="Files/doc/gui_documentation_index.html"/>
+			</editors>
+			<subNodes>
+				<subNode min="1" id="EntitiesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="masterLayer" type="string"/>
+			</attributes>
+			<generators>
+				<!--<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_gui_documentation_index.xsl" fileNameTemplate="Files/doc/gui_documentation_index.html">
+
+			<parameters>
+			</parameters>
+		</gen> -->
+			</generators>
+			<description>Describes all configuration related to the MDA GUI configuration such as Top Level Entities, displayed entities and used views including attribute definition.</description>
+		</node>
+		<node id="ModelDocumentationNode" visibleInParent="false" icon="icons/document_text.png" generated="true" name="modelDocumentation" label="Physical Model Documentation" explorerLeaf="true">
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" fileNameTemplate="Files/doc/model_documentation_index.html"/>
+			</editors>
+			<subNodes>
+				<subNode min="1" id="InstanceTablesNode" max="1"/>
+				<subNode min="1" id="MasterDataLayersNode" max="1"/>
+				<subNode min="1" id="ReferenceDataTablesNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_model_documentation_index.xsl" fileNameTemplate="Files/doc/model_documentation_index.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+			</parameters>
+				</gen>
+			</generators>
+			<description>Describes all models of Logical Model, i.e., how they look like. Provides overview of all entities/dictionaries from all data layers defined in current project.</description>
+		</node>
+		<node id="TechnicalDocumentationNode" visibleInParent="false" icon="icons/document_text.png" generated="true" name="technicalDocumentation" label="Technical Documentation" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="SourceSystemsNode" max="1"/>
+				<subNode min="1" id="ExportOperationsNode" max="1"/>
+				<subNode min="1" id="EventHandlersNode" max="1"/>
+				<subNode min="1" id="OtherSettingsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_technical_documentation_index.xsl" fileNameTemplate="Files/doc/technical_documentation_index.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+			</parameters>
+				</gen>
+			</generators>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" fileNameTemplate="Files/doc/technical_documentation_index.html"/>
+			</editors>
+			<description>Describes all configuration related to the MDM Hub configuration, such as Connected Systems, Load and Export operations, Event Handler settings, etc.</description>
+		</node>
+		<node id="InstanceTablesNode" name="instanceTables" label="Instance tables">
+			<subNodes>
+				<subNode min="0" id="InstanceTableNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="MasterDataLayersNode" name="masterLayers" label="Master data layers">
+			<subNodes>
+				<subNode min="0" id="MasterDataLayerNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ReferenceDataTablesNode" name="refDataTables" label="Reference data tables">
+			<subNodes>
+				<subNode min="0" id="ReferenceDataTableNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="InstanceTableNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="layer" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="cleansingPlan" type="string"/>
+				<attribute name="matchingPlan" type="string"/>
+				<attribute name="aggregatingPlan" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="InstanceRelationshipsNode" max="1"/>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_model_documentation_table.xsl" fileNameTemplate="Files/doc/model_documentation/tables/instance/{@name}.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+						<param source=".." name="tables"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="MasterDataLayerNode" name="layer" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="MasterDataTablesNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_model_documentation_master_layer.xsl" fileNameTemplate="Files/doc/model_documentation/master_layer_{@name}.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+			</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="MasterDataTablesNode" name="masterTables">
+			<subNodes>
+				<subNode min="0" id="MasterDataTableNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ReferenceDataTableNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="layer" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+				<subNode min="1" id="ReferenceDataRelationshipsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_model_documentation_table.xsl" fileNameTemplate="Files/doc/model_documentation/tables/dictionary/{@name}.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+						<param source=".." name="tables"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="MasterDataTableNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="layer" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="mergingPlan" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ColumnsNode" max="1"/>
+				<subNode min="1" id="MasterRelationshipsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/documentation/gen_model_documentation_table.xsl" fileNameTemplate="Files/doc/model_documentation/tables/{ancestor::layer/@name}/{@name}.html"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+						<param source=".." name="tables"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="ColumnsNode" name="columns">
+			<subNodes>
+				<subNode min="0" id="ColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="size" type="integer"/>
+				<attribute name="origin" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="pk" type="boolean"/>
+				<attribute name="fk" type="boolean"/>
+			</attributes>
+		</node>
+		<node id="EntitiesNode" abstract="false" name="entities">
+			<subNodes>
+				<subNode min="0" id="EntityNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="EntityNode" name="entity" label="{@label}">
+			<attributes>
+				<attribute name="label" type="string"/>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="topLevel" type="boolean"/>
+				<attribute name="layer" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="GridViewNode" max="1"/>
+				<subNode min="0" id="DetailedViewNode" max="1"/>
+				<subNode min="0" id="CartViewNode" max="1"/>
+				<subNode min="0" id="HistoryViewNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="GridViewNode" name="gridView" label="Grid view">
+			<subNodes>
+				<subNode min="1" id="GridColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="GridColumnsNode" name="columns">
+			<subNodes>
+				<subNode min="0" id="GridColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiColumnNode" abstract="true" name="guiColumn" label="{@label}">
+			<attributes>
+				<attribute name="label" type="string"/>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="string"/>
+			</attributes>
+		</node>
+		<node id="DetailedViewNode" name="detailedView">
+			<subNodes>
+				<subNode min="1" id="GroupsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="HistoryViewNode" name="historyView">
+			<subNodes>
+				<subNode min="1" id="HistoryColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="CartViewNode" name="cartView">
+			<subNodes>
+				<subNode min="1" id="CartColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="GroupsNode" name="groups">
+			<subNodes>
+				<subNode min="0" id="GroupNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GroupNode" name="group"/>
+		<node id="HistoryColumnsNode" name="columns">
+			<subNodes>
+				<subNode min="0" id="HistoryColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="CartColumnsNode" name="columns">
+			<subNodes>
+				<subNode min="0" id="CartColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GridColumnNode" inherits="GuiColumnNode" name="column"/>
+		<node id="HistoryColumnNode" inherits="GuiColumnNode" name="column"/>
+		<node id="CartColumnNode" inherits="GuiColumnNode" name="column"/>
+		<node id="InstanceRelationshipsNode" name="relationships" label="Relationships">
+			<subNodes>
+				<subNode min="0" id="InstanceRelationshipNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="InstanceRelationshipNode" inherits="GeneralRelationshipNode" name="relationship">
+			
+		</node>
+		<node id="ReferenceDataRelationshipsNode" name="relationships" label="Relationships">
+			<subNodes>
+				<subNode min="0" id="ReferenceDataRelationshipNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ReferenceDataRelationshipNode" inherits="GeneralRelationshipNode" name="relationship" label="{@name}"/>
+		<node id="GeneralRelationshipNode" abstract="true" name="abstractRel">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="parentRole" type="string"/>
+				<attribute name="childRole" type="string"/>
+				<attribute name="parentTable" type="string"/>
+				<attribute name="childTable" type="string"/>
+				<attribute name="parentColumn" type="string"/>
+				<attribute name="childColumn" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="MasterRelationshipsNode" name="relationships" label="Relationships">
+			<subNodes>
+				<subNode min="0" id="MasterRelationshipNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="MasterRelationshipNode" inherits="GeneralRelationshipNode" name="relationship" label="{@name}"/>
+		<node id="DocumentationNode" visibleInParent="true" generated="true" name="documentation" label="Documentation" expanded="true">
+			<subNodes>
+				<subNode min="1" id="GuiDocumentationNode" max="1"/>
+				<subNode min="1" id="ModelDocumentationNode" max="1"/>
+				<subNode min="1" id="TechnicalDocumentationNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="SourceSystemsNode" name="sourceSystems" label="Source Systems">
+			<subNodes>
+				<subNode min="0" id="SourceSystemNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="OtherSettingsNode" name="other" label="Other Settings">
+			<subNodes>
+				<subNode min="1" id="ReprocessSettings" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="doReprocess" type="boolean"/>
+				<attribute name="taskInfo" type="boolean"/>
+				<attribute name="taskInfoPlan" type="string"/>
+				<attribute name="taskInfoDesc" type="text"/>
+			</attributes>
+		</node>
+		<node id="EventHandlerNode" name="eventHandler" label="Event Handler">
+			<attributes>
+				<attribute name="desc" type="text"/>
+				<attribute name="enabled" type="boolean"/>
+				<attribute name="name" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="PublishersNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ExportOperationsNode" name="exportOperations" label="Export Operations">
+			<subNodes>
+				<subNode min="0" id="ExportOperationNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ExportOperationNode" name="exportOperation" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="scope" type="string"/>
+				<attribute name="allEntities" type="boolean"/>
+				<attribute name="layerName" type="string"/>
+				<attribute name="sourceSystem" type="string"/>
+				<attribute name="type" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ExportEntitiesNode" max="1"/>
+				<subNode min="1" id="DataSourcesNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="SourceSystemNode" name="sourceSystem" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="LoadPlans" max="1"/>
+				<subNode min="1" id="LoadedEntities" max="1"/>
+			</subNodes>
+		</node>
+		<node id="LoadedEntities" name="entities">
+			<subNodes>
+				<subNode min="0" id="LoadedEntityNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="LoadPlans" name="plans">
+			<subNodes>
+				<subNode min="0" id="LoadPlanNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="LoadedEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="IgnoredComparisonColumns" max="1"/>
+			</subNodes>
+		</node>
+		<node id="LoadPlanNode" name="plan" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+				<attribute name="deletionStrategy" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="LoadedEntities" max="1"/>
+			</subNodes>
+		</node>
+		<node id="IgnoredComparisonColumns" name="columns">
+			<subNodes>
+				<subNode min="0" id="IgnoredComparisonColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="IgnoredComparisonColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="ReprocessSettings" name="reprocess" label="Reprocess">
+			<subNodes>
+				<subNode min="0" id="ReprocessPlan" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ReprocessPlan" name="plan" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+		</node>
+		<node id="PublishersNode" name="publishers">
+			<subNodes>
+				<subNode min="0" id="PublisherNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="PublisherNode" name="publisher">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="desc" type="text"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="FilteredEntitiesNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ExportEntitiesNode" name="entities" label="Entities">
+			<subNodes>
+				<subNode min="0" id="ExportEntityNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ExportEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ExportColumnsNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="ExportColumnsNode" name="columns" label="Columns">
+			<subNodes>
+				<subNode min="0" id="ExportColumnNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="ExportColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+		</node>
+		<node id="DataSourcesNode" name="dataSources" label="Data Sources">
+			<subNodes>
+				<subNode min="0" id="DataSourceNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="DataSourceNode" name="dataSource" label="{@type}">
+			<attributes>
+				<attribute name="type" type="string"/>
+				<attribute name="allEntities" type="boolean"/>
+				<attribute name="mode" type="string"/>
+				<attribute name="scope" type="string"/>
+				<attribute name="sourceSystem" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="ExportEntitiesNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="FilteredEntitiesNode" name="entities" label="Entities">
+			<subNodes>
+				<subNode min="0" id="FilteredEntityNode" max="-1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="allEntities" type="boolean"/>
+				<attribute name="expression" type="string"/>
+			</attributes>
+		</node>
+		<node id="FilteredEntityNode" name="entity" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="expression" type="string"/>
+			</attributes>
+		</node>
+		<node id="EventHandlersNode" name="eventHandlers" label="Event Handlers">
+			<subNodes>
+				<subNode min="0" id="EventHandlerNode" max="-1"/>
+			</subNodes>
+		</node>
+	</nodes>
+</metametadata-library>

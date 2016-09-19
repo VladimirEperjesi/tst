@@ -1,0 +1,33 @@
+cluster.name: mdm_cluster_replace_me
+name: NodeClient
+transport.tcp.port: 9301
+
+#multicast.enabled: false
+#discovery.zen.ping.multicast.ping enabled: false
+#discovery.zen.ping.unicast.hosts: [ hostname, "hostname:port", hostname ]
+
+node.data: false
+node.master: true
+
+index.number_of_shards: 5
+index.number_of_replicas: 0
+
+path.data: ../storage/elasticNodeClient
+
+# turn off shards relocation base on disk usage
+cluster.routing.allocation.disk.threshold_enabled: false
+
+# how often elasticsearch will update disk info
+#cluster.info.update.interval: 60
+
+# do not relocate shards to disk where disk usage is more than 85% (or there is not at least 200mb free space)
+#cluster.routing.allocation.disk.watermark.low: 85%
+#cluster.routing.allocation.disk.watermark.low: 200mb
+
+# try to relocate shards if disk usage exceeds 90% (or there is less than 100mb free space)
+#cluster.routing.allocation.disk.watermark.high: 90%
+#cluster.routing.allocation.disk.watermark.high: 100mb
+
+script.groovy.sandbox.enabled: true
+
+#gateway.expected_data_nodes: 2

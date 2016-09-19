@@ -1,0 +1,1 @@
+This folder is used to store output files of migration export operation.

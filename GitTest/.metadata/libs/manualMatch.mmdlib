@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<imports>
+
+	</imports>
+	<nodes>
+		<node id="ManualMatchNode" abstract="false" visibleInParent="true" icon="icons/import1.png" sortChildren="true" visible="true" name="manualMatch" label="Manual Match Exceptions" expanded="false">
+			<subNodes>
+				<subNode min="1" id="ManualMatchOperationsNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+					<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+				</gen>
+			</generators>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="manualMatchOperations" class="com.ataccama.ame.core.editors.CreateChild" label="New Manual Match Operation">
+</editor>
+			</editors>
+			<attributes/>
+			<description>This nodo allows to define a batch load operation tha is able to load match manual exceptions into the MDC.
+&lt;!-- 1050 and all subsettings--&gt;</description>
+		</node>
+		<node id="ManualMatchOperationsNode" name="manualMatchOperations" label="Manual Match Operations" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractManualMatchTypeNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>List of Manual Match Load Operations</description>
+		</node>
+		<node id="AbstractManualMatchTypeNode" abstract="true" icon="icons/scroll_run.png" name="type" label="Operation Type" expanded="false">
+			<attributes/>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<subNodes/>
+			<generators/>
+			<description>Type of manual match load operation </description>
+		</node>
+		<node id="MatchingsNode" name="matchings" label="Selected Matchings Operations" expanded="true">
+			<subNodes>
+				<subNode min="0" id="MatchingNode" max="-1"/>
+			</subNodes>
+			<description>List of matchings that are selected. Matching operation are defined on Instance entity, Matching tab</description>
+		</node>
+		<node id="MatchingNode" name="matching" label="Matching Operation Name" expanded="false">
+			<attributes>
+				<attribute name="name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/tables/table/matchingTab/multipleMatching/matchingDefinitions/matchingDefinition
+						| /logicalModel/instanceModel/tables/table/matchingTab/defaultMatchingDefinition[1]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<description>Name of matching operation. Matching operation are defined on Instance entity, Matching tab (default name k)</description>
+		</node>
+		<node id="AllMatchingsNode" inherits="AbstractManualMatchTypeNode" name="allmatchings" label="All Matchings ({@name})" explorerLeaf="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Operation Name</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_manualMatch.xsl" fileNameTemplate="Files/engine/load/manual_match_{@name}.comp">
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instances"/>
+						<param source="/logicalModel/instanceModel/tables" name="tables"/>
+					</parameters>
+				</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>/settings/advancedSettings[@matchingCompatibility=&#39;true&#39;]</expression>
+					<message>If Matching Compatibility Mode is used, Manual Match Operation should not be used!</message>
+				</validation>
+			</validations>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/load/manual_match_{@name}.comp"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Manual Match Operation"/>
+			</editors>
+			<description>Manual Match Operation&#39;s interface contains all defined matchings. </description>
+		</node>
+		<node id="SelectedMatchingsNode" inherits="AbstractManualMatchTypeNode" name="selectedMatchings" label="Selected Matchings ({@name})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="MatchingsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Operation name</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen source="." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_manualMatch.xsl" fileNameTemplate="Files/engine/load/manual_match_{@name}.comp">
+					<parameters>
+						<param source="/preview/databaseModel/instanceTables" name="instances"/>
+						<param source="/logicalModel/instanceModel/tables" name="tables"/>
+					</parameters>
+				</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>/settings/advancedSettings[@matchingCompatibility=&#39;true&#39;]</expression>
+					<message>If Matching Compatibility Mode is used, Manual Match Operation should not be used!</message>
+				</validation>
+			</validations>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/load/manual_match_{@name}.comp"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Manual Match Operation"/>
+			</editors>
+			<description>Manual Match Operation&#39;s interface contains only selected matchings. </description>
+		</node>
+	</nodes>
+</metametadata-library>

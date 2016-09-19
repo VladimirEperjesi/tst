@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<runtimeconfig>
+		<!--
+	  Configuration for named url resources (used in steps like Soap Call, etc.)
+	-->
+	<contributedConfigs>
+	<!--
+	    <config class="com.ataccama.dqc.processor.support.UrlResourceContributor">
+	    <!- - Optional authorization: user, password - ->
+	      <urls>
+		<url name="localhost" url="localhost:7777" user="test" password="crypted:DES:NsuAku14ipInv4Z7FZAFKRjAVIxjqxmTpX8HwSTGUlE=" />
+	      </urls>
+	    </config>
+	-->
+	
+	 	<config class="com.ataccama.dqc.jms.config.JmsContributor">
+	      <jmsConnections>
+	        <jmsConnection connectionFactory="QueueConnectionFactory" name="amqPlain">
+	          <contextParams>
+	            <contextParam name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+	            <contextParam name="java.naming.provider.url" value="tcp://localhost:61616"/>
+	          </contextParams>
+	        </jmsConnection>
+	        <jmsConnection connectionFactory="TopicConnectionFactory" name="mdaConnector">
+	          <contextParams>
+	            <contextParam name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+	            <contextParam name="java.naming.provider.url" value="tcp://localhost:61616"/>
+	            <contextParam name="topic.mda.server.topic" value="mda.server.topic"/>
+	          </contextParams>
+	        </jmsConnection>
+	        <jmsConnection connectionFactory="QueueConnectionFactory" name="esbEvents">
+	          <contextParams>
+	            <contextParam name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+	            <contextParam name="java.naming.provider.url" value="tcp://localhost:61616"/>
+	          </contextParams>
+	        </jmsConnection>	        
+	       </jmsConnections>
+        </config>
+
+	</contributedConfigs>
+
+
+
+	<!-- List of database connection definitions -->
+	<dataSources>
+		<!--
+		These attributes define the DB connection:
+		  name		  - unique identifier of the data source connection.
+		  url		  - connection string to data source (JDBC)
+		  driverClass - java class name of the driver used for connection (JDBC)
+		  user		  - name of the data source user (DB schema)
+		  password	  - password used for data source connection
+		  
+		Optional attributes influencing the connection pooling behavior:
+		  minSize	  - minimum number of connections in the connection pool
+		  maxAge	  - if the connection is not used for specified time (in milliseconds) the connection will be closed
+		  maxIdleSize - maximum number of inactive connections that will be used for connection pooling
+		-->
+
+		<dataSource driverclass="org.apache.derby.jdbc.ClientDriver" name="mdc_db" user="mdc" password="mdc" url="jdbc:derby://localhost:1528/mdc;create=true" />
+		<dataSource driverclass="org.apache.derby.jdbc.ClientDriver" name="esb_db" user="esb" password="esb" url="jdbc:derby://localhost:1528/esb;create=true" />
+		<dataSource driverclass="org.apache.derby.jdbc.ClientDriver" name="umc_db" user="umc" password="umc" url="jdbc:derby://localhost:1527/umc;create=true" />
+		
+	</dataSources>
+
+	<!--
+	  Bellow you can define path variables. You can use path variables in configuration files like 
+	  configuration plans as shortcuts to folders which may be on each system on different path location.
+	-->
+	<pathVariables>
+		<pathVariable name="EXT" value="../data/ext"/>
+		<pathVariable name="DATA" value="../data"/>
+		<pathVariable name="COMPONENTS" value="../components"/>
+		<pathVariable name="HUB_RD_LKP" value="../data/ext/lkp/referenceData"/>
+		<pathVariable name="DOCUMENTATION" value="../doc"/>
+	</pathVariables>
+
+	<parallelismLevel>1</parallelismLevel>
+	
+	<!--
+	<loggingConfig>runtimeConfigLogging.xml</loggingConfig>
+	-->
+	
+	<!-- Workflow resources definition -->
+	<resources>
+		<resource id="db" units="100" name="Database Connections"/>
+		<resource id="cpu" units="16" name="CPU Usage (cores)" />
+		<resource id="memory" units="8192" name="Memory (MB)" />
+		<resource id="storage" units="20971520" name="Storage Device (MB)" />
+	</resources>
+</runtimeconfig>

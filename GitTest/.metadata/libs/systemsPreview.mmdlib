@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="SystemsPrevNode" abstract="false" icon="icons/server_earth.png" sortChildren="false" generated="true" name="systems" label="System Name Views">
+			<subNodes>
+				<subNode min="0" id="SystemNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="SystemNode" icon="icons/server_connection.png" sortChildren="false" generated="false" name="system" label="{@name}" explorerLeaf="false">
+			<subNodes>
+
+			</subNodes>
+			<attributes>
+				<attribute name="name" label="System Name" type="string" required="true">
+					<description>Short and descriptive name for new source system (e.g. CRM). It will be used later as a part of the name for load operation. It is also available in transformation plans as &lt;kbd&gt;eng_source_system&lt;/kbd&gt;</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor targetNodePath="." class="com.ataccama.ame.core.editors.PropertyEditor" label="Edit..."/>
+			</editors>
+			<generators>
+        
+      </generators>
+		</node>
+	</nodes>
+</metametadata-library>

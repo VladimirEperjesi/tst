@@ -1,0 +1,522 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="NativeServiceNode" abstract="false" icon="icons/services.png" generated="false" name="nativeServices" label="Services" explorerLeaf="true" expanded="false">
+			<subNodes>
+				<subNode min="1" id="BasicServicesNode" max="1"/>
+				<subNode min="1" id="ConfigurableServicesNode" max="1"/>
+				<subNode min="1" id="EndpointsDefinitionNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltGenerator">
+					<fileNameTemplate>Files/etc/nme-services.gen.xml</fileNameTemplate>
+					<source>.</source>
+					<templatePath>xslt/gen_services_xml.xsl</templatePath>
+					<parameters>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</gen>
+			</generators>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>MDM Hub is able to provide out of the box native services. There is almost no need of additional configuration, but just enabling the serveces on and simple definition of endpoints.</description>
+		</node>
+		<node id="EndpointsDefinitionNode" name="endpointsDefinition" newTab="true" label="Endpoints Definition" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractEndpointNode" max="-1"/>
+			</subNodes>
+			<attributes>
+				
+			
+			
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>*/@pathPrefix</selectPath>
+					<message>Endpoint Path Prefix has to be unique!</message>
+				</validation>
+			</validations>
+			<description>Definition of endpoints, where the native services are available.
+&lt;!-- 1000 --&gt;</description>
+		</node>
+		<node id="ConfigurableServicesNode" name="configurableServices" label="Configurable Services" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractConfigurableServiceNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>processDeltaAdv/@name</selectPath>
+					<message>Only one configurable Process Delta service of the name &#39;{.}&#39; can be defined!</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>cleanseService/@name</selectPath>
+					<message>Only one Cleanse Service of the name &#39;{.}&#39; can be defined!</message>
+				</validation><!--<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+  					<expression>.[count(processUpsert/@system)&gt;1]</expression>
+ 					<message>Only one Connected System should be used for all Process Upsert services!</message>
+				</validation>--><!-- <validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+  					<selectPath>processUpsert/@entity</selectPath>
+ 					<message>Only one Process Upsert service per {.} entity should be defined!</message>
+				</validation> --><validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>identify/@dummyName</selectPath>
+					<message>Only one Indentify can be defined for the &#39;{identify/@masterLayer}&#39; master data layer and the &#39;{identify/@entity}&#39; entity !</message>
+				</validation><!-- <validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[count(processUpsert) = count(processUpsert/@system) and count(processUpsert) = count(processUpsert/@entity)]</expression>
+					<message>Only one Process Upsert service for Connected System '{processUpsert/@system}' and entity '{processUpsert/@entity}' can be defined!</message>
+				</validation> --><validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[count(identify)&gt;count(/logicalModel/masterModels/*/masterTables/masterTable[@entityRole=&#39;golden&#39;])]</expression>
+					<message>Number of Identify services has to be lower or equal to number of &#39;Golden&#39; entities defined ({count(/logicalModel/masterModels/*/masterTables/masterTable[@entityRole=&#39;golden&#39;])})!</message>
+				</validation>
+			</validations>
+			<description>Native services that require additional settings and allow requiring security role</description>
+		</node>
+		<node id="AbstractConfigurableServiceNode" abstract="true" name="abstractConfigurableServices" label="Configurable Services">
+			<attributes>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="true">
+					<description>Allows turning the Configurable Service generation off. If false, the Service is not a part of the MDM hub configuration.</description>
+				</attribute>
+				<attribute name="desc" label="Description" type="string">
+					<description>Configurable Service description</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				
+			
+			
+			</subNodes>
+		</node>
+		<node id="BasicServicesNode" name="basicServices" label="Basic Services" explorerLeaf="false" expanded="true">
+			<attributes>
+				<attribute visible="true" name="genTraversal" label="Enable Generic Traversal" type="boolean" required="true" defaultValue="true">
+					<description>Generic Traversal allows to create a request to retrieve multiple entities connected by relations and traversing the data in the Master Data Layer model. For each Master Data Layer, there is one generic&lt;i&gt;MasterDataLayer&lt;/i&gt;Traversal service created.
+
+The two basic features are:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;traversing&lt;/kbd&gt;: allows to change the starting point for entities preloading in model - what record to return as root element&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;preloading&lt;/kbd&gt;: allows to preload records connected to current record by relationship (joins)&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="getInstance" label="Enable Get Instance Record By Id" type="boolean" required="true" defaultValue="true">
+					<description>This service is getting an instance entity by its ID. For each instance entity, there is one service get&lt;i&gt;Entity&lt;/i&gt;InstanceById created.</description>
+				</attribute>
+				<attribute name="getMaster" label="Enable Get Master Record By Id" type="boolean" required="true" defaultValue="true">
+					<description>This service is getting a master entity by its ID. For each master entity and master data layer, there is one service get&lt;i&gt;Entity/MasterDataLayer&lt;/i&gt;ById created.</description>
+				</attribute>
+				<attribute visible="true" name="searchInstance" label="Enable Search Instance" type="boolean" required="true" defaultValue="true">
+					<description>This service searches the records of an instance entity. For each instance entity, there is one service search&lt;i&gt;Entity&lt;/i&gt;Instances created.
+This service searches the records of a master entity. For each master entity and master data layer, there is one service search&lt;i&gt;Entity/MasterDataLayer&lt;/i&gt; created.
+This service lists records of a master entity. For each master entity Example in master view Mv, there is one service listExampleMv.
+Service searches records of instance entity.For every instance entity Example, there is one service searchExampleInstances</description>
+				</attribute>
+				<attribute visible="true" name="searchMaster" label="Enable Search Master " type="boolean" required="true" defaultValue="true">
+					<description>This service searches the records of a master entity. For each master entity and master data layer, there is one service search&lt;i&gt;Entity/MasterDataLayer&lt;/i&gt; created.</description>
+				</attribute>
+				<attribute visible="true" name="listInstance" label="Enable List Instance " type="boolean" required="true" defaultValue="false">
+					<description>This service lists the records of an instance entity. For each instance entity, there is one service list&lt;i&gt;Entity&lt;/i&gt;Instances created.
+</description>
+				</attribute>
+				<attribute visible="true" name="listMaster" label="Enable List Master " type="boolean" required="true" defaultValue="false">
+					<description>This service lists the records of a master entity. For each master entity and master data layer, there is one service list&lt;i&gt;Entity/MasterDataLayer&lt;/i&gt; created.</description>
+				</attribute>
+				<attribute name="processDelta" label="Enable Process Delta" type="boolean" required="true" defaultValue="false">
+					<description>Allows remote applications to modify the data in the hub without the need to set up and schedule load operations; the changed data are transferred in the message payload&lt;br/&gt;
+The entity is used as an autonomous/central entity of a request - for dependency setting, please see configurable Process Delta service. However, it is possible to insert related entities within the same request.&lt;br/&gt;
+The following services are created:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;processDelta&lt;/kbd&gt;: sychronous verison of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processDeltaAsync&lt;/kbd&gt;: asynchronous version of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processDeltaAsyncGet&lt;/kbd&gt;: get result of asynchronous service&lt;/li&gt;&lt;/ul&gt;
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+				<attribute name="processMatch" label="Enable Process Match" type="boolean" required="true" defaultValue="false">
+					<description>Allows remote applications to apply manual match exceptions.
+&lt;!-- 1000 --&gt; </description>
+				</attribute>
+				<attribute name="rwControl" label="Enable Read/Write Control Switch" type="boolean" required="true" defaultValue="false">
+					<description>This services bundle allows external applications to switch data access mode between RW and RO. The Read/Write Control Swith service is useful for High Avalability module.
+The following services are created:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;switchReadWriteMode&lt;/kbd&gt;: switch to the given target mode&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;getReadWriteMode&lt;/kbd&gt;: returns the data access mode of the MDM hub instance&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute visible="true" name="batchControl" label="Enable Batch Control" type="boolean" required="true" defaultValue="true">
+					<description>The services bundle allows external applications to schedule load and export operations without the need to interact with the workflow component and/or parse the pages at the Web Console.
+The following services are created:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;invokeLoadOperation&lt;/kbd&gt;: invokes a load operation of the given name&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;invokeMultiLoadOperation&lt;/kbd&gt;: invokes a load operations of the given names as a one transaction&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;invokeExportOperation&lt;/kbd&gt;: invokes an export operation of the given name&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;getTaskStatus&lt;/kbd&gt;: for a given taskId (returned by the services above) retrieves the status details for that task&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute visible="true" name="getModel" label="Enable Get Model" type="boolean" required="true" defaultValue="false">
+					<description>This service getModel provides detailed information on underlying MDM hub data model. Service is read only and the model cannot be changed in this way.</description>
+				</attribute>
+				<attribute visible="true" name="modelStat" label="Enable Model Statistics" type="boolean" required="true" defaultValue="false">
+					<description>The services bundle provides statistics about data in the MDM hub - count of active and inactive records for every entity. Records physically deleted in the MDM hub (records with eng_existing=0) are not counted neither displayed.
+The following services are created:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;getInstanceStatistics&lt;/kbd&gt;: Returns count of active and inactive records for every instance entity and additionally for every combination of source system and instance entity. This service provides answer to question like &quot;How many active party records from CRM system are in the hub?&quot;&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;getMasterStatistics&lt;/kbd&gt;: Returns count of active and inactive records for every master entity across all master data layers. This service provides answer to question like &quot;How many active master party records are in the hub?&quot;&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@processMatch=&#39;true&#39; and /settings/advancedSettings[@matchingCompatibility=&#39;true&#39;]]</expression>
+					<message>If Matching Compatibility Mode is enabled, Process Match service shouldn&#39;t be used!</message>
+				</validation>
+			</validations>
+			<description>Definition of basic native services i.e. these services don&#39;t have any additional settings.</description>
+		</node>
+		<node id="ProcessUpsertNode" inherits="AbstractConfigurableServiceNode" name="processUpsert" label="Process Upsert ({@system}/{@entity})" expanded="false">
+			<attributes>
+				<attribute name="system" label="Connected System" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/preview/systems/*/@name</selectPath>
+					</valuesProvider>
+					<description>Name of the Source system that is used to process inserted records.</description>
+				</attribute>
+				<attribute name="entity" label="Entity" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Entity for which the Process Upsert is configured. The entity is used as a central entity of a request. However, it is possible to insert related entities within the same request.
+</description>
+				</attribute>
+			</attributes>
+			<description>Allows remote applications to modify the data in the hub. It is designed for modifying records owned by the hub (the MDM hub must act as System of record for input records). 
+The following services are created per each service occurence (connected system and an instance entity):
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;processUpsert&lt;i&gt;Entity&lt;/i&gt;&lt;/kbd&gt;: sychronous verison of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processUpsert&lt;i&gt;Entity&lt;/i&gt;Async&lt;/kbd&gt;: asynchronous version of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processUpsert&lt;i&gt;Entity&lt;/i&gt;AsyncGet&lt;/kbd&gt;: get result of asynchronous service&lt;/li&gt;&lt;/ul&gt;</description>
+		</node>
+		<node id="CleanseServiceNode" visibleInParent="true" inherits="AbstractConfigurableServiceNode" visible="true" name="cleanseService" label="Cleanse Service ({@name}/{@entity})" expanded="false">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Service name definition.
+</description>
+				</attribute>
+				<attribute name="entity" label="Entity" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Entity for which the DQF service is configured.
+</description>
+				</attribute>
+			</attributes>
+			<description>Allows to use already defined cleansing plans/transitions as Data Quality Firewall services.
+&lt;!-- 1030 and below--&gt;</description>
+		</node>
+		<node id="IdentifyNode" inherits="AbstractConfigurableServiceNode" name="identify" label="Identify ({@entity}{@masterLayer})">
+			<attributes>
+				<attribute name="masterLayer" label="Master Layer" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/masterModels/*</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Master Layer definition</description>
+				</attribute>
+				<attribute name="entity" label="Entity" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/ancestor::identify/@masterLayer)]/masterTables/*[@entityRole=&#39;golden&#39;]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Only master entities of golden type should be used for Identify service!</description>
+				</attribute>
+				<attribute name="name" label="Name" type="string" required="false">
+					<description>Service name definitition. If it is not defined, concatenation of &#39;identify&#39;, master layer name and entity name is used: e.g. identifypartymasters.</description>
+				</attribute>
+			</attributes>
+			<validations><!-- The following validation is not necessary, because only golden type of entities are allowed! --><validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+					<expression>.[/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/@masterLayer)]/masterTables/masterTable[lower-case(@name)=lower-case($current/@entity)]/@entityRole=&#39;golden&#39;]</expression>
+					<message>Identify service is defined for {@entity} entity on {@masterLayer} master layer, that is not set to &#39;golden&#39; entity role.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+					<expression>.[/logicalModel/instanceModel/*/table[lower-case(@name)=lower-case(/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/@masterLayer)]/masterTables/masterTable[lower-case(@name)=lower-case($current/@entity)]/@instanceTable)]/matchingTab/@enableIdentify=&#39;true&#39;]</expression>
+					<message>Identify service is not enabled on instance {lower-case(/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/@masterLayer)]/masterTables/masterTable[lower-case(@name)=lower-case($current/@entity)]/@instanceTable)} entity, matching tab!</message>
+				</validation>
+			</validations>
+			<description>The service gets as an input attributes of instance entity/entities (one record), it runs a cleansing and matching plan, and returns a matched master record. If the record is identified to any existing record(s) in already processed and stored data, it returns the matched master record, otherwise it returns an empty response.
+Only the one service is created using either default name or name specied in the following definition.</description>
+		</node>
+		<node id="ProcessMatchNode" name="processMatch" label="Process Match ({@entity}{@masterLayer})">
+			<attributes>
+				<attribute name="masterLayer" label="Master Layer" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/masterModels/*</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Master Layer definition</description>
+				</attribute>
+				<attribute name="entity" label="Entity" type="string" required="true">
+					<description>Only master entities of golden type should be used for Process Match service!</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/logicalModel/masterModels/masterModel[lower-case(@name)=lower-case($current/ancestor::processMatch/@masterLayer)]/masterTables/*[@entityRole=&#39;golden&#39;]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="name" label="Name" type="string" required="false">
+					<description>Service name definitition. </description>
+				</attribute>
+			</attributes>
+			<validations><!-- The following validation is not necessary, because only golden type of entities are allowed! --><validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+					<expression>.[/logicalModel/masterModels/masterModel[@name=$current/@masterLayer]/masterTables/masterTable[@name=$current/@entity]/@entityRole=&#39;golden&#39;]</expression>
+					<message>Identify service is defined for {@entity} entity on {@masterLayer} master layer, that is not set to &#39;golden&#39; entity role.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+					<expression>.[/logicalModel/instanceModel/*/table[@name=/logicalModel/masterModels/masterModel[@name=$current/@masterLayer]/masterTables/masterTable[@name=$current/@entity]/@instanceTable]/matchingTab/@enableIdentify=&#39;true&#39;]</expression>
+					<message>Identify service is not enabled on instance {/logicalModel/masterModels/masterModel[@name=$current/@masterLayer]/masterTables/masterTable[@name=$current/@entity]/@instanceTable} entity, matching tab!</message>
+				</validation>
+			</validations>
+			<description>Allows remote applications to apply manual match exceptions.
+&lt;!-- 1000 --&gt;</description>
+		</node>
+		<node id="ProcessDeltaAdvNode" inherits="AbstractConfigurableServiceNode" name="processDeltaAdv" label="Process Delta ({@name})">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Service name definition.</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>partialTables/partialTable/@name | dependencySettings/tableSettings/table/@name</selectPath>
+					<message>Entity &#39;{.}&#39; is used many times in Process delta configuration! Each entity should be present just once and either in Selected Entities section or in Delta Dependency Settings section. </message>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="PartialLoadTableSettingsNode" max="1"/>
+				<subNode min="1" id="DeltaDependencySettingNode" max="1"/>
+			</subNodes>
+			<description>Allows remote applications to modify the data in the hub without the need to set up and schedule load operations; the changed data are transferred in the message payload. The service supports so-called partial mode (only selected columns can be modified) and/or advanced settings of delta dependency setting similar to complex delta load operation.&lt;br/&gt;
+The following services are created:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;processDelta&lt;i&gt;name&lt;/i&gt;&lt;/kbd&gt;: sychronous version of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processDelta&lt;i&gt;name&lt;/i&gt;Async&lt;/kbd&gt;: asynchronous version of the service&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;processDelta&lt;i&gt;name&lt;/i&gt;AsyncGet&lt;/kbd&gt;: get result of asynchronous service&lt;/li&gt;&lt;/ul&gt;
+&lt;!-- 1000 and below --&gt;</description>
+		</node>
+		<node id="AbstractEndpointNode" abstract="true" name="abstractEndpoint" label="Endpoint Definition " expanded="false">
+			<subNodes>
+				
+			
+			</subNodes>
+			<attributes>
+				<attribute name="enable" label="Enable" type="boolean" required="true" defaultValue="true">
+					<description>Allows turning the Endpoint generation off. If false, the Endpoint is not a part of the MDM hub configuration.</description>
+				</attribute>
+				<attribute name="format" label="Service Format" type="enum" required="true" enumValues="SOAP,XML RPC">
+					<description>Define an output format of services provided by the endpoint</description>
+				</attribute>
+				<attribute name="pathPrefix" label="Endpoint Path Prefix" type="string" required="true">
+					<description>Endpoint Path Prefix defines a part of URL, where the services are deployed.&lt;br/&gt;E.g. if MDM server runs on &lt;i&gt;localhost:8888&lt;/i&gt;, prefix is part of the path in the following way: &lt;i&gt;localhost:8888/&lt;strong&gt;soapOverHttp&lt;/strong&gt;/&lt;kbd&gt;NativeServiceName&lt;/kbd&gt;&lt;/i&gt; i.e. the prefix is &lt;kbd&gt;soapOverHttp&lt;/kbd&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>.</selectPath>
+						<staticValues>
+							<entry value="soapOverHttp" label="soapOverHttp"/>
+							<entry value="soapOverJms" label="soapOverJms"/>
+							<entry value="xmlRpcOverHttp" label="xmlRpcOverHttp"/>
+							<entry value="xmlRpcOverJms" label="xmlRpcOverJms"/>
+						</staticValues>
+					</valuesProvider>
+				</attribute>
+				<attribute name="listenerNames" label="Listener Names" type="string" required="true" defaultValue="all">
+					<description>Allows defining listener name(s) where the endpoint is available. Listener name(s) are defined in &lt;i&gt;*.serverConfig&lt;/i&gt;&lt;br /&gt; Default: &lt;kbd&gt;all&lt;/kbd&gt;</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@pathPrefix</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>Endpoint Path Prefix {.} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+			<description>Abstract endpoint definition node</description>
+		</node>
+		<node id="jmsEndpointNode" inherits="AbstractEndpointNode" name="jmsEndpoint" label="JMS endpoint">
+			<subNodes>
+				<subNode min="1" id="OutputParametersNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="connectionName" label="Connection Name" type="string" required="true">
+					<description>Name of the JMS connection that is defined in *.serverConfig</description>
+				</attribute>
+				<attribute name="inputDestination" label="Input Destination" type="string" required="true">
+					<description>Name if the input queue/topic.</description>
+				</attribute>
+				<attribute name="outputDestination" label="Output Destination" type="string" required="true">
+					<description>Name if the output queue/topic.</description>
+				</attribute>
+				<attribute name="activityByReadWriteMode" label="Activity Control By Operation Mode" type="boolean" required="true" defaultValue="false">
+					<description>Allows to control endpoint activity when MDC switching between RO/RW modes. If it is set to true the endpoint behaves in the following way:
+&lt;li&gt; If engine is switched to RO mode, endpoint is stopped&lt;/li&gt;
+&lt;li&gt;If engine is switched to RW mode, endpoint is started&lt;/li&gt;&lt;/br&gt;
+Default: false
+&lt;!-- 1050 --&gt;
+
+
+</description>
+				</attribute>
+			</attributes>
+			<description>JMS endpoint definition</description>
+		</node>
+		<node id="httpEndpointNode" inherits="AbstractEndpointNode" name="httpEndpoint" label="HTTP endpoint">
+			<subNodes>
+				
+			
+			
+			</subNodes>
+			<description>HTTP endpoint definition</description>
+		</node>
+		<node id="OutputParametersNode" name="outputParameters" label="JMS Properties" expanded="true">
+			<subNodes>
+				<subNode min="0" id="OutputParameterNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>*/@name</selectPath>
+					<message>Output Parameter name has to be unique!</message>
+				</validation>
+			</validations>
+			<description>Set of headers for the JMS messages</description>
+		</node>
+		<node id="OutputParameterNode" name="outputParameter" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>JMS property name</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>JMS property value</description>
+				</attribute>
+				<attribute name="type" label="Type" type="enum" required="true" enumValues="STRING,INT,LONG,BOOLEAN" defaultValue="STRING">
+					<description>JMS property data type</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>JMS property name {.} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="DeltaLoadTableSettingsNode" name="tableSettings" label="Selected Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="TableSettingsNode" max="-1"/>
+			</subNodes>
+			<validations>
+      	<!-- <validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+			<selectPath>table/@name</selectPath>
+			<message>Duplicate entity name! In case of an entity dependent on more central entities, define it on Advanced tab (Partitioned entities).</message>
+		</validation> -->
+	</validations>
+			<description>Configuration of processed entities</description>
+		</node>
+		<node id="TableSettingsNode" name="table" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="string" required="true">
+					<description>Entity name
+&lt;!-- 						ancestor::system/sourceMappings/mapping[@entity !=preceding-sibling::mapping[1]/@entity or count(preceding-sibling::mapping)=0] --&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+						/logicalModel/instanceModel/*/table
+
+						</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="mode" label="Delta Dependency Mode" type="list" required="true" defaultValue="autonomous">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>ancestor::tableSettings/table[@mode=&#39;central&#39;]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>Dependent on {@name}</labelTemplate>
+						<staticValues>
+							<entry value="central" label="Central"/>
+							<entry value="autonomous" label="Autonomous"/>
+						</staticValues>
+					</valuesProvider>
+					<description>Configuration of Entity Dependency Handling in incremental processing. Available settings:
+&lt;ul&gt;
+&lt;li&gt;&lt;kbd&gt;autonomous&lt;/kbd&gt; (default): entity is processed independently from the rest of the entities&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;central&lt;/kbd&gt;: entity is processed in incremental load using the change type. The entity determines change processing for the corresponding Dependent entities&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;dependent on [central_entity]&lt;/kbd&gt;: entity is processed as a full load within the context of the central entity&lt;/li&gt;
+&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="keyColumn" columnWidth="40" label="Key Column (Central and Dependent modes)" type="string">
+					<description>Use primary key column for central or autonomous entities. For dependent entities use foreign key column reference to the central entity (central entity PK)</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/preview/databaseModel/instanceTables/*[@name=lower-case($current/../@name)]/columns/*[(@isFk=&#39;true&#39; or @isPk=&#39;true&#39;) and (@origin=&#39;source&#39; or @origin=&#39;internal&#39;)]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation message="Key Column must be defined for Dependent and Central entities." class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@mode=&quot;autonomous&quot; or @keyColumn !=&#39;&#39;]</expression>
+				</validation>
+				<validation message="Owning entity must be defined for Dependent entities." class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@mode!=&quot;dependent&quot; or @owningTable !=&#39;&#39;]</expression>
+				</validation>
+			</validations>
+			<subNodes>
+				<subNode min="1" id="PartialLoadColumnsSettings" max="1"/>
+			</subNodes>
+			<description>Selected entity</description>
+		</node>
+		<node id="PartialLoadTableSettingsNode" name="partialTables" label="Selected Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="PartialLoadTableSetting" max="-1"/>
+			</subNodes>
+			<description>Defines entities that are allowed for R/W operations via the native service interface.</description>
+		</node>
+		<node id="PartialLoadTableSetting" name="partialTable" label="Selected Entity">
+			<subNodes>
+				<subNode min="1" id="PartialLoadColumnsSettings" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="name" label="Entity Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/*/table</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Entity name</description>
+				</attribute>
+			</attributes>
+			<description>Selected entity.</description>
+		</node>
+		<node id="PartialLoadColumnsSettings" name="partialColumns" label="Selected Columns for Partial Mode" expanded="true">
+			<subNodes>
+				<subNode min="0" id="PartialLoadColumnsSetting" max="-1"/>
+			</subNodes>
+			<description>Process Delta can be defined in so-called partial mode, i.e. only selected columns of selected entities can be changed. The rest of entity&#39;s columns remain untouched.</description>
+		</node>
+		<node id="PartialLoadColumnsSetting" name="partialColumn" label="Column">
+			<attributes>
+				<attribute name="name" label="Column Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::processDeltaAdv/partialTables/partialTable/@name) or @name=lower-case($current/ancestor::table/@name)]/columns/column[@origin=&#39;source&#39;]</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Selected column name
+&lt;!-- source_id is missing but it might be a part of metadata? --&gt;</description>
+				</attribute>
+			</attributes>
+			<description>Column selected for Process Delta partial mode.</description>
+		</node>
+		<node id="DeltaDependencySettingNode" name="dependencySettings" label="Delta Dependency Settings" expanded="true">
+			<subNodes>
+				<subNode min="1" id="DeltaLoadTableSettingsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="deletionStrategy" label="Source Deletion Strategy" type="enum" required="true" enumValues="use global setting (from Preferences),delete,deactivate" defaultValue="use global setting (from Preferences)">
+					<description>Use this configuration to override the global &lt;i&gt;Source Deletion Strategy&lt;/i&gt; settings from &lt;i&gt;Preferences&lt;/i&gt;.</description>
+				</attribute>
+			</attributes>
+			<description>Delta dependency settings allows to configure behaviour for complex input structures (similar to complex delta load operation)</description>
+		</node>
+	</nodes>
+</metametadata-library>

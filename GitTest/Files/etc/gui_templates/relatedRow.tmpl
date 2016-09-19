@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+
+  <parameters>
+      <parameter name="firstColumnFormat"/>
+      <parameter name="secondColumnFormat"/>
+  </parameters>
+  
+  <mappings>
+    <contextType>ROW</contextType>
+  </mappings>
+
+  <content>
+
+      <!-- expand to max, create container for absolute content -->
+      <div style="width:100%;position:relative;">
+          <!-- absolute content: create background, fill exact space -->
+          <div classes="rowState-${sys:stateActivity}">
+              <!-- relative content: provide exact padding -->
+              <div style="width: 100%;">
+                    <!-- individual row values with table-cell displaying -->
+                    <div style="display: inline-block; left: 0px; position: relative;" classes="rowIteratorHeader">
+                        <rowLabel dataFormat="${firstColumnFormat}">
+                            <actions>
+                                <action action="select" />
+                            </actions>
+                        </rowLabel>
+                    </div>
+                    <div classes="rowIteratorFieldSeparator">
+                    </div>
+                    <div style="display: inline-block; left: 0px; position: relative;" classes="rowIteratorValue">
+                        <rowLabel dataFormat="${secondColumnFormat}" classes="data-value">
+                            <actions>
+                                <action action="openDetail"/>
+                            </actions>
+                        </rowLabel>
+                    </div>
+                    <div style="padding-left:10px; display:inline-block; top:25%; width: 16px;" classes="linkImage">
+                      <image href="${appPrefix}/images/link.png" hoverHref="${appPrefix}/images/link-hover.png" height="18px" width="18px">
+                          <actions>
+                              <action action="openDetail"/>
+                          </actions>
+                      </image>
+                    </div>
+                    <div classes="activityState">
+                        <image href="${appPrefix}/images/row-activity-${sys:stateActivity}.png" height="14px" width="14px" tooltip="Activity state: ${sys:stateActivity}"/>
+                    </div>
+              </div>
+          </div>
+      </div>
+
+  </content>
+</template>

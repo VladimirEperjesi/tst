@@ -1,0 +1,304 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library xmlns:fn="http://www.w3.org/2005/xpath-functions">
+	<nodes>
+		<node id="DicNode" abstract="false" icon="icons/books.png" sortChildren="false" name="dictionary" label="Reference Data" explorerLeaf="false">
+			<subNodes>
+				<subNode min="1" id="DicTablesNode" max="1"/>
+				<subNode min="1" id="GeneratedDicTablesNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="tables" class="com.ataccama.ame.core.editors.CreateChild" label="New Dictionary">
+		</editor>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Build Plan" fileNameTemplate="Files/data/ext/build/hub_reference_data_build.plan"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Load Plan" fileNameTemplate="Files/engine/load/referenceData/hub_reference_data.comp"/>
+			</editors>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Supports and automates reference data mastering. There are two types of reference data (also called dictionaries): translation - used to translate source system dependent codes to master codes (source system independent) - and master - used mainly for data providing to deliver additional information for the master code, such as master name and description(s).&lt;br/&gt;
+Each dictionary definition automatically creates following artifacts with predefined structure (typical settings):
+&lt;ul&gt;&lt;li&gt;A build plan to generate a lookup file (a lookup step is generated when a dictionary is used on an instance entity) - usually applicable for a Translation dictionary&lt;/li&gt;
+&lt;li&gt;Entity definition, Load operation and a plan to load data in - usually applicable for a Master dictionary&lt;/li&gt;
+&lt;/ul&gt;
+To deliver full functionality, reference data definition has to be used on an Instance or Master entity.&lt;br/&gt;
+note: sources have to be created in an external tool.</description>
+		</node>
+		<node id="DicTablesNode" icon="icons/tables.png" name="tables" label="Dictionaries" expanded="true">
+			<subNodes>
+				<subNode min="0" id="DicTableNode" max="-1"/>
+			</subNodes><!--<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+           			<expression>table[count(ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData=$current/@name)>0 and (@instUse!='none' or @loadInst='true')]
+           			|table[count(ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData=$current/@name)=0]
+					</expression>
+           			<message>Dictionary is mapped to instance column! Either choose instance use different from "None" or enable Instance Load.</message>
+       			</validation>
+       		</validations>--><description>Basic definition of each reference data dictionary, such as the load and usage settings</description>
+		</node>
+		<node id="DicTableNode" icon="icons/table.png" name="table" label="{@name}" explorerLeaf="true" expanded="false">
+			<attributes>
+				<attribute name="name" label="Dictionary Name" type="string" required="true">
+					<description>Reference Data dictionary name</description>
+				</attribute>
+				<attribute name="loadInst" columnWidth="31" label="Load Translation Dictionary to DB" type="boolean" required="true" defaultValue="false">
+					<description>Stores translation dictionary as a &lt;i&gt;rd_&amp;lt;reference_data_dictionary_name&amp;gt;_trans&lt;/i&gt; table into the MDM hub storage&lt;br/&gt;
+Defaul attributes: 
+&lt;li&gt;&lt;kbd&gt;source_code&lt;/kbd&gt; (string): source system dependent code for a dictionary&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;source_system&lt;/kbd&gt; (string): source system code equal to &lt;i&gt;Connected System&lt;/i&gt; definition&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;master_code&lt;/kbd&gt; (string): global master code&lt;/li&gt;&lt;br/&gt;
+Default: &lt;i&gt;false&lt;/i&gt;
+</description>
+				</attribute>
+				<attribute name="instUse" label="Use of Translation Dictionary" type="enum" required="true" enumValues="cleansing,load,none" defaultValue="cleansing">
+					<description>Allows to use translation dictionary in an Instance entity Reference Data definition. When a dictionary is used:
+&lt;li&gt;&lt;kbd&gt;cleansing&lt;/kbd&gt; (default): Lookup step is generated into appropriate cleanse plan&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;load&lt;/kbd&gt;: Lookup step is generated into appropriate load plans&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;none&lt;/kbd&gt;: no Lookup step is generated and the dictionary cannot be used on Instance entity&lt;/li&gt;
+</description>
+				</attribute>
+				<attribute name="loadMas" label="Load Master Dictionary to DB" type="boolean" required="true" defaultValue="true">
+					<description>Stores master dictionary as a &lt;i&gt;rd_&amp;lt;reference_data_dictionary_name&amp;gt;&lt;/i&gt; table into the MDM hub storage&lt;br/&gt;
+Default attributes: 
+&lt;li&gt;&lt;kbd&gt;master_code&lt;/kbd&gt; (string): global master code&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;master_name&lt;/kbd&gt; (string): name of master code&lt;/li&gt;&lt;br/&gt;
+Default: &lt;i&gt;true&lt;/i&gt;</description>
+				</attribute>
+				<attribute visible="false" name="sourceCodeType" label="Source Code Type" type="enum" enumValues="string,integer,long,float" defaultValue="string">
+					<description>&lt;!-- not relevant, because all input columns are strings --&gt;</description>
+				</attribute>
+				<attribute name="masterCodeType" label="Master Code Type" type="enum" enumValues="string,integer,long,float" defaultValue="string">
+					<description>Allows to define data type of Master Code&lt;br/&gt;
+Defaut: string
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+				<attribute name="usageValidation" columnWidth="35" label="Usage of Master Dictionary for Validation" type="enum" required="true" enumValues="none,load,cleansing" defaultValue="none">
+					<description>Allows to use master dictionary in an Instance entity Reference Data definition for a validation purpose (i.e. Reference Data is already mastered and it is necessary to validate it). When a dictionary is used:
+&lt;li&gt;&lt;kbd&gt;cleansing&lt;/kbd&gt; (default): Validation Lookup step is generated into appropriate cleanse plan&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;load&lt;/kbd&gt;: Validation Lookup step is generated into appropriate load plans&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;none&lt;/kbd&gt;: no Validation Lookup step is generated and the dictionary cannot be used on Instance entity&lt;/li&gt;&lt;br/&gt;
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+				<attribute name="label" label="GUI Label" type="string">
+					<description>Reference data dictionary name displayed in MDA GUI</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Reference data dictionary description</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="DicAdditionalColumnsNode" max="1"/>
+				<subNode min="1" id="DicSettings" max="1"/>
+				<subNode min="1" id="GeneratedInstanceMaxLengthNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor showTree="false" openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Dictionary"/>
+			</editors>
+			<validations><!--<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+           			<expression>.[$current/@name=ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData and (@instUse!='none' or @loadInst='true')]
+           			|.[$current/@name!=ancestor::logicalModel/instanceModel/tables/table/columns/column/@refData]
+					</expression>
+           			<message>Dictionary is mapped to instance column! Either choose instance use different from "None" or enable Instance Load.</message>
+       			</validation>--><validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>Reference data table name {@name} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MaxLengthValidation">
+					<selectPath>@name</selectPath>
+					<maxLength>maxLength/@maxInstTableLength</maxLength>
+					<message>Value &#39;{.}&#39; exceeds maximum allowed value length {ancestor::table/maxLength/@maxInstTableLength} char</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@instUse!=&#39;none&#39; and @usageValidation!=&#39;none&#39;]</expression>
+					<message>Master Dictionary can be used only if Translation Dictionary is none.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@usageValidation!=&#39;none&#39; and @loadInst=&#39;true&#39;]</expression>
+					<message>Load Translation Dictionary to DB can be used only if Use of Master Dictionary for Validation is none.</message>
+				</validation>
+			</validations>
+			<description>Dictionary definition</description>
+		</node>
+		<node id="GeneratedInstanceMaxLengthNode" visibleInParent="false" visible="false" generated="true" name="maxLength" label="Max Length">
+			<attributes>
+				<attribute name="maxInstTableLength" type="integer"/>
+				<attribute name="maxColumnLength" type="integer"/>
+				<attribute name="maxInstMatchTableLength" type="string"/>
+			</attributes>
+		</node>
+		<node id="DicSettings" name="lookupSettings" newTab="true" label="Lookup Builder Settings" expanded="true">
+			<attributes>
+				<attribute name="removeAccents" label="Matching Val - Do Remove Accents" type="boolean" required="true" defaultValue="true">
+					<description>Remove word diacritics (accents). 
+Default value: true.</description>
+				</attribute>
+				<attribute name="removeRepeatedChars" label="Matching Val - Do Remove Repeated Chars" type="boolean" required="true" defaultValue="false">
+					<description>Remove repeated characters. 
+Default value: false.</description>
+				</attribute>
+				<attribute name="squeezeWS" label="Matching Val - Do Squeeze Whitespaces" type="boolean" required="true" defaultValue="true">
+					<description>Repeated white space characters are replaced with a single space character. 
+Default value: true.</description>
+				</attribute>
+				<attribute name="upperCase" label="Matching Val - Do Upper Case" type="boolean" required="true" defaultValue="true">
+					<description>Convert all words to upper case. 
+Default value: true.</description>
+				</attribute>
+				<attribute name="substituteWith" label="Matching Val - Substitute With" type="string">
+					<description>String which substitutes unsupported characters. 
+Defaut value: none (No substitution is performed by default).</description>
+				</attribute>
+				<attribute name="supportedChars" label="Supported Characters" type="string" required="true" defaultValue="[:all:]">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>.</selectPath>
+						<staticValues>
+							<entry value="[:all:]" label="[:all:]"/>
+							<entry value="[:letter:]" label="[:letter:]"/>
+							<entry value="[:digit:]" label="[:digit:]"/>
+							<entry value="[:lowercase:]" label="[:lowercase:]"/>
+							<entry value="[:uppercase:]" label="[:uppercase:]"/>
+							<entry value="[:white:]" label="[:white:]"/>
+						</staticValues>
+					</valuesProvider>
+					<description>Definition of supported characters. Characters not contained in this set are removed or substituted. See character set definition syntax. 
+Default value: none (All characters are supported by default).</description>
+				</attribute>
+				<attribute name="approxIndex" label="Approximative Index" type="boolean" required="true" defaultValue="false">
+					<description>Specifies that index enabling approximative string searching will be included in the output file. Requires key of type string. 
+If not specified, hash index will be created. The hash index is applicable to any key type. 
+Default = false.</description>
+				</attribute>
+				<attribute name="bestDistanceIndex" label="Best Distance Index" type="boolean" required="true" defaultValue="false">
+					<description>Applicable for string key only. Specifies that real key values will be stored into file and this values will be used to narrowing possibly ambiguous search result. Searching is narrowed by selecting only rows which are &quot;nearest to searched key&quot; - the distance between searched real key and real key found is minimal. The distance is counted as case insensitive editDistance relative to (divided by) length of found key. 
+Default = false.</description>
+				</attribute>
+				<attribute name="bidirectApproxIndex" label="Bidirect Approximative Index" type="boolean" required="true" defaultValue="false">
+					<description>The approximative index will be enhanced by adding secondary tree for searching in backward direction. This should improve performance of approximative searching.</description>
+				</attribute>
+				<attribute visible="false" name="duplicities" label="Duplicities" type="enum" required="true" enumValues="FIRST,OMIT,ACCEPT" defaultValue="ACCEPT">
+					<description>Specifies handling of duplicate keys and whether the index created in the file can be non-unique.</description>
+				</attribute>
+			</attributes>
+			<description>Allows influencing translation dictionary behavior when a lookup file is generated, i.e. apply the following setting to the generated lookup builder step.</description>
+		</node>
+		<node id="DicAdditionalColumnsNode" name="columns" newTab="true" label="Additional Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="DicColumnNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor showTree="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.imports.DatabaseStructureImporter">
+					<entityContainerPath>tables</entityContainerPath>
+					<entityNamePath>@name</entityNamePath>
+					<columnContainerPath>columns</columnContainerPath>
+					<columnNamePath>@name</columnNamePath>
+					<columnTypePath>@type</columnTypePath>
+					<columnDbTypePath>@dbType</columnDbTypePath>
+					<relationContainerPath>relationships</relationContainerPath>
+					<relationNamePath>@name</relationNamePath>
+					<relationParentTablePath>@parentTable</relationParentTablePath>
+					<relationChildTablePath>@childTable</relationChildTablePath>
+					<relationParentColumnPath>@parentColumn</relationParentColumnPath>
+					<relationChildColumnPath>@childColumn</relationChildColumnPath>
+					<relationFKContainer>representativeForeignKey</relationFKContainer>
+				</editor>
+				<editor class="com.ataccama.ame.core.imports.RelationalXmiImporter">
+					<entityContainerPath>tables</entityContainerPath>
+					<entityNamePath>@name</entityNamePath>
+					<columnContainerPath>columns</columnContainerPath>
+					<columnNamePath>@name</columnNamePath>
+					<columnTypePath>@dqcType</columnTypePath>
+					<columnDbTypePath>@dbType</columnDbTypePath>
+					<columnIsMandatoryPath>@mandatory</columnIsMandatoryPath>
+					<columnCommentPath>@comment</columnCommentPath>
+					<relationContainerPath>relationships</relationContainerPath>
+					<relationNamePath>@name</relationNamePath>
+					<relationParentTablePath>@parentTable</relationParentTablePath>
+					<relationChildTablePath>@childTable</relationChildTablePath>
+					<relationParentColumnPath>@parentColumn</relationParentColumnPath>
+					<relationChildColumnPath>@childColumn</relationChildColumnPath>
+					<relationFKContainer>foreignKeys</relationFKContainer>
+				</editor>
+			</editors>
+			<validations>
+				
+			
+			
+       		</validations>
+			<description>Definition of attributes that are added on top of the predefined ones.</description>
+		</node>
+		<node id="DicColumnNode" name="column" label="{@name}:{@dqcType}">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Name of the additional attribute</description>
+				</attribute>
+				<attribute name="type" label="Type" type="enum" required="true" enumValues="string,integer,datetime,day,long,long_int,boolean,float" defaultValue="string">
+					<description>Type of the additional attribute </description>
+				</attribute>
+				<attribute name="size" label="Length (DB)" type="integer" required="true" defaultValue="1024">
+					<description>Size of the additional attribute </description>
+				</attribute>
+				<attribute visible="true" name="instance" label="In Translation Dictionary" type="boolean" required="true" defaultValue="false">
+					<description>Add the additional attribute as a part of translation table, default: &lt;i&gt;false&lt;/i&gt;</description>
+				</attribute>
+				<attribute visible="true" name="master" label="In Master Dictionary" type="boolean" required="true" defaultValue="true">
+					<description>Add the additional attribute as a part of master table, default: &lt;i&gt;true&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="label" label="GUI Label" type="string">
+					<description>MDA GUI label of the additional attribute</description>
+				</attribute>
+				<attribute name="comment" label="Comment" type="text">
+					<description>Attribute description</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MaxLengthValidation">
+					<selectPath>@name</selectPath>
+					<maxLength>ancestor::table/maxLength/@maxColumnLength</maxLength>
+					<message>Value &#39;{.}&#39; exceeds maximum allowed value length {ancestor::table/maxLength/@maxColumnLength} char</message><!--Column &#39;{.}&#39; - value exceeds maximum allowed value length of column in dictionary &#39;{ancestor::table/@name}&#39;</message>--></validation>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>ancestor::columns/column/@name</selectPath>
+					<message>&#39;{.}&#39; is not an unique column name in dictionary &#39;{ancestor::table/@name}&#39;</message>
+				</validation><!--<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+           			<expression>ancestor::columns/column[@primary=&#39;true&#39;]</expression>
+          			<message>Entity &#39;{./@name}&#39; doesn&#39;t have the primary key</message>
+      			 </validation>	--><validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@instance=&#39;true&#39; and ancestor::table[@usageValidation!=&#39;none&#39;]]</expression>
+					<message>In Translation Dictionary can be used only if Use of Translation Dictionary != none.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="GeneratedDicTablesNode" visibleInParent="false" sortChildren="true" visible="false" generated="true" name="genTables">
+			<subNodes>
+				<subNode min="0" id="GeneratedLoadPlanNode" max="1"/>
+				<subNode min="0" id="GeneratedBuildPlanNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="GeneratedLoadPlanNode" visibleInParent="false" sortChildren="false" visible="false" name="loadPlan">
+			<generators>
+				<gen source="../.." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_load_dictionaries.xsl" fileNameTemplate="Files/engine/load/referenceData/hub_reference_data.comp">
+					<parameters>
+						<param source="/preview/databaseModel/refData" name="refData"/>
+						<param source="/systems" name="systems"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="GeneratedBuildPlanNode" visibleInParent="false" sortChildren="false" visible="false" name="buildPlan">
+			<generators>
+				<gen source="../.." class="com.ataccama.ame.core.generators.XsltPlanFileGenerator" templatePath="xslt/gen_build_dictionaries.xsl" fileNameTemplate="Files/data/ext/build/hub_reference_data_build.plan">
+					<parameters>
+						<param source="/preview/databaseModel/lookups" name="lookups"/>
+						<param source="/systems" name="systems"/>
+						<param source="/logicalModel/dictionary" name="dictionary"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+	</nodes>
+</metametadata-library>

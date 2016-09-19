@@ -1,0 +1,367 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes><!-- Physical model: databases: tables --><node id="GuiPreviewNode" abstract="false" icon="icons/application_enterprise_view.png" sortChildren="true" generated="true" name="guiPreview" label="GUI Labels View" explorerLeaf="false">
+			<subNodes>
+				<subNode min="1" id="GuiMasterModelsPreviewNode" max="1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Based on a particular Master Layer, shows attribute labels to be used in (MDA) GUI.</description>
+		</node>
+		<node id="GuiMasterTablesPreviewNode" icon="icons/tables.png" name="masterTables" label="Master Tables" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiMasterTablePreviewNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiInstanceTablesPreviewNode" icon="icons/tables.png" name="instanceTables" label="Instance tables" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiInstanceTablePreviewNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiMasterTablePreviewNode" icon="icons/view.png" name="masterTable" label="{@name}" explorerLeaf="true">
+			<attributes>
+				<attribute name="name" label="Name" type="string"/>
+				<attribute name="label" label="GUI Label" type="string">
+					<description>Label used in GUI - defined in Master model on master table</description>
+				</attribute>
+				<attribute name="topLevel" label="Top Level" type="boolean"/>
+			</attributes>
+			<generators>
+				<gen source=".[@topLevel=&#39;true&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_detailViewMasTopLevel.xsl" fileNameTemplate="Files/etc/gui_templates/mda-detailMasTL_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+				<gen source=".[@topLevel=&#39;true&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_hierarchyRoot.xsl" fileNameTemplate="Files/etc/gui_templates/mda-hierarchyRoot_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+				<gen source=".[@topLevel=&#39;false&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_detailViewMas.xsl" fileNameTemplate="Files/etc/gui_templates/mda-detailMas_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+			</generators>
+			<subNodes>
+				<subNode min="1" id="GuiMasterColumnsPreviewNode" max="1"/>
+				<subNode min="1" id="GuiTableTemplatesPreview" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiInstanceTablePreviewNode" icon="icons/view.png" name="instanceTable" label="{@name}" explorerLeaf="true">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="label" label="GUI label" type="string"/>
+				<attribute name="topLevel" type="boolean"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="GuiInstanceColumnsPreviewNode" max="1"/>
+				<subNode min="1" id="GuiTableTemplatesPreview" max="1"/>
+			</subNodes>
+			<generators>
+				<gen source=".[@topLevel=&#39;true&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_detailViewInstTopLevel.xsl" fileNameTemplate="Files/etc/gui_templates/mda-detailInstTL_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+				<gen source=".[@topLevel=&#39;false&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_detailViewInst.xsl" fileNameTemplate="Files/etc/gui_templates/mda-detailInst_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+				<gen source=".[@topLevel=&#39;true&#39; and ancestor::model[@enabled=&#39;true&#39;]]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_hierarchyInstRoot.xsl" fileNameTemplate="Files/etc/gui_templates/mda-hierarchyRoot_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					</parameters>
+				</gen>
+			</generators>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiInstanceColumnsPreviewNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiInstanceColumnPreviewNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiMasterColumnsPreviewNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiMasterColumnPreviewNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiMasterColumnPreviewNode" inherits="GuiColumnGeneralPreviewNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="label" label="GUI label" type="string">
+					<description>Label defined in Master model on master table columns - this label will be used in GUI</description>
+				</attribute>
+				<attribute name="indexType" label="Index Type" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiInstanceColumnPreviewNode" inherits="GuiColumnGeneralPreviewNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="label" label="Label" type="string">
+					<description>Label defined in the Instance model on instance table columns (brackets with prefix are added automatically)</description>
+				</attribute>
+				<attribute name="customLabel" label="Custom Label" type="string">
+					<description>Custom label defined in Master model on instance tables&#39; columns</description>
+				</attribute>
+				<attribute visible="false" name="finalLabel" label="Final GUI Label" type="string">
+					<description>Final label that will be used in GUI (either label from instance model or custom label from master model)</description>
+				</attribute>
+				<attribute name="indexType" label="Index Type" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiMasterModelsPreviewNode" icon="icons/elements.png" name="masterModels" label="Master data layers in GUI">
+			<subNodes>
+				<subNode min="0" id="GuiMasterModelPreviewNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiMasterModelPreviewNode" icon="icons/branch_element.png" name="model" label="{@name} (enabled: {@enabled})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="GuiInstanceTablesPreviewNode" max="1"/>
+				<subNode min="1" id="GuiMasterTablesPreviewNode" max="1"/>
+				<subNode min="1" id="GuiMasterRelationshipsPreviewNode" max="1"/>
+				<subNode min="1" id="GuiMnRelationshipsPreviewNode" max="1"/>
+				<subNode min="1" id="GuiDictionariesTablesPreviewNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="name" label="Name" type="string"/>
+				<attribute visible="false" name="enabled" label="Enabled" type="boolean">
+					<description>&lt;!-- 10.0.0--&gt;</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.RelationEditor" label="Edit Schema">
+					<tableTypes>
+						<tableType icon="icons/table.png" name="Master Table">
+							<tableContainerSelectorPath>masterTables</tableContainerSelectorPath>
+							<tableNamePath>@label</tableNamePath>
+							<columnSelectorPath>columns/column</columnSelectorPath>
+							<columnDisplayTemplate>{@label}</columnDisplayTemplate>
+							<entityColorings>
+								<coloring color="#8b0000">
+									<test>.[@topLevel=&quot;true&quot;]</test>
+								</coloring>
+								<coloring color="#008000">
+									<test>.[@topLevel=&quot;false&quot;]</test>
+								</coloring>
+							</entityColorings>
+						</tableType>
+						<tableType icon="icons/table.png" name="Instance Table">
+							<tableContainerSelectorPath>instanceTables</tableContainerSelectorPath>
+							<tableNamePath>@label</tableNamePath>
+							<columnSelectorPath>columns/column</columnSelectorPath>
+							<columnDisplayTemplate>{@finalLabel}</columnDisplayTemplate>
+							<entityColorings>
+								<coloring color="#0000ff">
+									<test>.</test>
+								</coloring>
+							</entityColorings>
+						</tableType>
+						<tableType icon="icons/table.png" name="Dictionary Table">
+							<tableContainerSelectorPath>dictionaryTables</tableContainerSelectorPath>
+							<tableNamePath>@label</tableNamePath>
+							<columnSelectorPath>columns/column</columnSelectorPath>
+							<columnDisplayTemplate>{@label}</columnDisplayTemplate>
+							<entityColorings>
+								<coloring color="#c71585">
+									<test>.</test>
+								</coloring>
+							</entityColorings>
+						</tableType>
+					</tableTypes>
+					<relationshipTypes>
+						<relationshipType name="Relationship">
+							<relationshipContainerSelectorPath>relationships</relationshipContainerSelectorPath>
+							<relationshipNamePath>@label</relationshipNamePath>
+							<relationshipParentPath>@parentLabel</relationshipParentPath>
+							<relationshipChildPath>@childLabel</relationshipChildPath>
+						</relationshipType>
+					</relationshipTypes>
+				</editor>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<generators>
+				<gen source=".[@enabled=&#39;true&#39;]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_model.xsl" fileNameTemplate="Files/etc/mda-model.gen.xml"><!--  XSLT-based file generator that stores the result of XSLT transformation to the specified file. --><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="GuiColumnGeneralPreviewNode" name="generalColumn" label="General">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+				<attribute name="searchable" type="boolean"/>
+			</attributes>
+			<subNodes>
+				<subNode min="0" id="GuiColumnProducerNode" max="1"/>
+				<subNode min="1" id="GuiColumnDescriptionNode" max="1"/>
+			</subNodes>
+		</node>
+		<node id="GuiMasterRelationshipsPreviewNode" icon="icons/graph_edge_directed.png" sortChildren="true" name="relationships" label="Relationships" explorerLeaf="false" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiMasterRelationshipPreviewNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiMasterRelationshipPreviewNode" name="relationship" label="{@name}">
+			<attributes>
+				<attribute name="name" columnWidth="30" label="Name" type="string"/>
+				<attribute name="label" columnWidth="30" label="GUI label" type="string"/>
+				<attribute name="parentRole" columnWidth="30" label="Parent Role" type="string"/>
+				<attribute name="childRole" columnWidth="30" label="Child Role" type="string"/>
+				<attribute name="parentTable" columnWidth="25" label="Parent Table" type="string"/>
+				<attribute name="parentLabel" label="Parent Label" type="string"/>
+				<attribute name="childTable" columnWidth="25" label="Child Table" type="string"/>
+				<attribute name="childLabel" label="Child Label" type="string"/>
+				<attribute name="parentFk" columnWidth="25" label="Parent PK" type="string"/>
+				<attribute name="childFk" columnWidth="25" label="Child FK" type="string"/>
+				<attribute name="type" columnWidth="30" type="string"/>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiColumnProducerNode" visibleInParent="false" visible="false" name="producer" label="Producer">
+			<attributes>
+				<attribute name="value" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiMnRelationshipsPreviewNode" name="mnRelationships" label="MN Relationships" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiMnRelationshipPreviewNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiMnRelationshipPreviewNode" name="mnRelationship" label="MN Relationship" expanded="false">
+			<attributes>
+				<attribute name="name" label="Entity name" type="string">
+					<description>Name of the MN entity</description>
+				</attribute>
+				<attribute name="label" label="Label" type="string">
+					<description>Equal to &quot;Destination Label&quot;. This label will identify the bridge relationship in all content assists in GUI definition in model.</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen source=".[ancestor::model[@enabled=&#39;true&#39;] ]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_hierarchyRootMN.xsl" fileNameTemplate="Files/etc/gui_templates/mda-hierarchyRoot_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+						<param source="." name="mnRelationship"/>
+					</parameters>
+				</gen>
+			</generators>
+			<description>For the purpose of depiction, MDA needs to transform an associative entity and its two relationships (see NME data model) into logical M:N relationship (MDA GUI). To do so we have to define M2N Relationships Bridge on the associative entity. 
+	The bridge is used instead of the original relationships. It is oriented - there is a reverse name as well. Relationship role can be used instead of pre-generated technical name.
+	There are two directions with following orientation:
+		Destination direction goes from an entity to a related entity via Source Relationship and then via Destination Relationship
+		Source direction goes from an entity to a related entity via Destination Relationship and then via Source Relationship
+	Note: MDA shows the related entity directly without the associative table. Result of the bridge is based on the 2nd relationship in both directions.</description>
+		</node>
+		<node id="GuiDictionariesTablesPreviewNode" icon="icons/tables.png" name="dictionaryTables" label="Dictionary Tables" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiDictionaryTablePreviewNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiDictionaryTablePreviewNode" icon="icons/view.png" name="dictionaryTable" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="label" label="GUI lable" type="string"/>
+				<attribute name="topLevel" type="boolean"/>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="GuiDictionaryColumnsPreviewNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+		</node>
+		<node id="GuiDictionaryColumnsPreviewNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="GuiDictionaryColumnPreviewNode" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiDictionaryColumnPreviewNode" inherits="GuiColumnGeneralPreviewNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="label" label="Label" type="string"/>
+				<attribute name="indexType" label="Index Type" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiTableTemplatesPreview" name="templates" label="Templates Preview">
+			<subNodes>
+				<subNode min="0" id="GuiTableTemplatePreview" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiTableTemplatePreview" name="template" label="Template Preview">
+			<subNodes>
+				<subNode min="1" id="GuiTableDetailTemplatesPreview" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="templateType" label="Template Type" type="string"/>
+			</attributes>
+		</node>
+		<node id="GuiTableDetailTemplatesPreview" name="detailTemplates" label="Detail Templates Preview">
+			<subNodes>
+				<subNode min="0" id="GuiTableDetailTemplatePreview" max="-1"/>
+			</subNodes>
+		</node>
+		<node id="GuiTableDetailTemplatePreview" name="detailTemplate" label="Detail Template Preview">
+			<attributes>
+				<attribute name="templateType" label="Detail Template Type" type="string"/>
+				<attribute name="name" label="Name" type="string"/>
+				<attribute name="relationship" label="Relationship" type="string"/>
+				<attribute name="templatePosition" label="Detail Template Position" type="string"/>
+			</attributes>
+			<generators><!-- obsolete - this generator was used for textual hiererchies configuration, but now it is not required for the displaying purpose
+				
+				<gen source=".[@templateType=&#39;labeledRelatedMNList&#39; and ancestor::model[@enabled=&#39;true&#39;] ]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_hierarchyRel.xsl" fileNameTemplate="Files/etc/gui_templates/mda-hierarchyRel_{@name}.gen.tmpl">
+				<!- - XSLT-based file generator that stores the result of XSLT transformation to the specified file.- ->
+				<parameters>
+					<param source="/logicalModel/masterModels" name="masterModels"/>
+					<param source="/settings" name="settings"/>
+					<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+					<param source="../../../../." name="tableName"/>
+				</parameters>
+				
+				</gen> --><!-- todo: add hierarchy view label as a condition for the generator / not useful, because this is not configuration of rel, but configuration of root for entities that are not topLevel 
+				it should be used for @topLevel=&#39;false&#39; only
+				--><gen source=".[@templateType=&#39;labeledRelatedList&#39; and ancestor::model[@enabled=&#39;true&#39;] ]" ignoreEmptySource="true" class="com.ataccama.ame.core.generators.XsltGenerator" templatePath="xslt/gui/gui_hierarchyRoot1N.xsl" fileNameTemplate="Files/etc/gui_templates/mda-hierarchyRoot_{@name}.gen.tmpl"><!-- XSLT-based file generator that stores the result of XSLT transformation to the specified file.--><parameters>
+						<param source="/logicalModel/masterModels" name="masterModels"/>
+						<param source="/settings" name="settings"/>
+						<param source="/preview/guiPreview/masterModels/model[@enabled=&#39;true&#39;]" name="modelName"/>
+						<param source="../../../../." name="tableName"/>
+					</parameters>
+				</gen>
+			</generators>
+		</node>
+		<node id="GuiColumnDescriptionNode" visibleInParent="false" visible="false" name="description" label="Description">
+			<attributes>
+				<attribute name="value" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>

@@ -1,0 +1,746 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library xmlns:fn="http://www.w3.org/2005/xpath-functions">
+	<nodes>
+		<node id="ExportNode" icon="icons/export2.png" name="exportModel" label="Export Operations">
+			<subNodes>
+				<subNode min="0" id="AbstractExportOperationNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor targetNodePath="." class="com.ataccama.ame.core.editors.CreateChild" label="New Operation...">
+		</editor>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>*/@name</selectPath>
+					<message>Duplicate operation name &quot;{.}&quot;.</message>
+				</validation>
+			</validations>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+			<!-- Generator does not generate any file, it merely causes the UI to show the Generate... action. -->
+		</gen>
+			</generators>
+			<description>Definition of several types of batch export operations. Both full and delta exports are available from both Instance and Master Layers.</description>
+		</node>
+		<node id="AbstractExportOperationNode" abstract="true" icon="icons/scroll_run.png" name="abstractExport" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Operation Name" type="string" required="true">
+					<description>Export operation name</description>
+				</attribute>
+				<attribute name="scope" label="Scope" type="enum" required="true" enumValues="active,existing,use global scope (from Preferences)" defaultValue="use global scope (from Preferences)">
+					<description>Export scope definition. You can override the default settings from &lt;i&gt;Preferences&lt;/i&gt;
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt;: export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+			</attributes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/export/{@name}.comp</fileNameTemplate>
+					<source>.</source>
+					<parameters>
+						<param source="/preview/databaseModel" name="databaseModel"/>
+						<param source="/advancedSettings/historyPlugin" name="historyPlugin"/>
+					</parameters>
+					<templatePath>xslt/gen_export_plan.xsl</templatePath>
+				</gen>
+			</generators>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[@scope!=&#39;use global scope (from Preferences)&#39;]|//settings[@scope!=&#39;none&#39;]</expression>
+					<message>Scope must be filled</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@name</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>Export operation name {@name} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation><!--<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="false">
+			<expression>.[dataSources/historyInstanceEntityDataSource]|.[dataSources/historyMasterEntityDataSource]|.[dataSources/conditionalMasterDataSource]|.[dataSources/conditionalInstanceDataSource]|.[@allEntities=&#39;true&#39;]|.[selectedTables/table]|.[selectedTables/instanceTable]|.[dataSources/instanceDataSource/selectedTables/instanceTable]|.[dataSources/masterDataSource/selectedTables/table]</expression>
+			<message>No entities defined for the given export operation!</message>
+		</validation>--></validations>
+			<subNodes>
+				
+			
+			</subNodes>
+		</node>
+		<node id="FullMasterExportNode" inherits="AbstractExportOperationNode" name="fullMasterExport" label="Full Master Export ({@name})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="SelectedMasterTablesNode" max="1"/>
+				<subNode min="1" id="AdvancedExportNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="layerName" label="Master Layer Name" type="list" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/masterModels/*</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Export only records from selected Master Layer of &lt;i&gt;Logical Model&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="true">
+					<description>Allows to export all available entities.</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Export Description</description>
+				</attribute>
+			</attributes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Operation"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/export/{@name}.comp"/>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;true&#39; and selectedTables/table]</expression>
+					<message>Option &quot;All Entities&quot; enabled. Remove selected tables from the list or disable option &quot;All Entities&quot;.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="FullInstanceExportNode" abstract="false" inherits="AbstractExportOperationNode" name="fullInstanceExport" label="Full Instance Export ({@name})" explorerLeaf="true">
+			<subNodes>
+				<subNode min="1" id="SelectedInstanceTablesNode" max="1"/>
+				<subNode min="1" id="AdvancedExportNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Operation"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan File" fileNameTemplate="Files/engine/export/{@name}.comp"/>
+			</editors>
+			<attributes>
+				<attribute name="sourceSystem" label="Source System Filter" type="list" required="false">
+					<description>Export only instance records from selected system</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/systems/system[lower-case(@name) = /preview/systems/*/@name]/@name | 
+	/logicalModel/masterModels/masterModel/guiConfig[@guiSystem=/preview/systems/*/@name and @enableGui=&#39;true&#39;]/@guiSystem</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="true">
+					<description>Allows to export all available entities.</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Export description</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;true&#39; and selectedTables/instanceTable]</expression>
+					<message>Option &quot;All Entities&quot; enabled. Remove selected tables from the list or disable option &quot;All Entities&quot;.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="ComplexExportNode" inherits="AbstractExportOperationNode" name="complexExport" label="Complex Export ({@name})">
+			<subNodes>
+				<subNode min="1" id="DataSourcesNode" max="1"/>
+				<subNode min="1" id="metaColumnsNode" max="1"/>
+				<subNode min="1" id="AdvancedExportNode" max="1"/>
+			</subNodes>
+			<editors>
+				<editor showTree="false" openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Operation"/>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" label="Open Plan" fileNameTemplate="Files/engine/export/{@name}.comp"/>
+				<editor targetNodePath="dataSources" class="com.ataccama.ame.core.editors.CreateChild" label="New Data Source">
+		</editor>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>dataSources/*/@prefix</selectPath>
+					<message>Duplicate data source prefix &quot;{.}&quot;.</message>
+				</validation>
+			</validations>
+			<attributes>
+				<attribute name="description" label="Description" type="text">
+					<description>Export description</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="SelectedMasterTablesNode" name="selectedTables" label="Selected Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedMasterTableNode" max="-1"/>
+			</subNodes>
+			<description>List of master layer entities exported by this operation</description>
+		</node>
+		<node id="SelectedMasterTableNode" name="table" label="{@name}" expanded="false">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="string" required="true">
+					<description>Exported entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+							/logicalModel/masterModels/*[lower-case(@name) = lower-case($current/../../../@layerName)]/masterTables/*						
+						</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allColumns" label="Export all columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this entity including MDM Engine auditing columns</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="SelectedMasterColumnsNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and columns/column]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="SelectedInstanceTablesNode" name="selectedTables" label="Selected Entities" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedInstanceTableNode" max="-1"/>
+			</subNodes>
+			<description>List of instance entities exported by this operation</description>
+		</node>
+		<node id="SelectedInstanceTableNode" name="instanceTable" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Entity Name" type="string" required="true">
+					<description>Exported entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/*/table|
+						/preview/databaseModel/refData/physicalTable[@layerName!= &#39;&#39;]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allColumns" label="Export All Columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this entity including MDM Engine auditing columns</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="SelectedInstanceColumnsNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and columns/column]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="DataSourcesNode" name="dataSources" label="Data Sources" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractDataSourceNode" max="-1"/>
+			</subNodes>
+			<description>Various data sources definition within the Complex Export</description>
+		</node>
+		<node id="AbstractDataSourceNode" abstract="true" name="abstractDataSource" explorerLeaf="true">
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+				<editor class="com.ataccama.ame.core.editors.DeleteChild" label="Delete Data Source"/>
+			</editors>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.RegexpValidation">
+					<selectPath>./@prefix</selectPath>
+					<valueExpr>[\p{L}\p{Digit}_]+</valueExpr>
+					<message>Data source prefix {@prefix} contains unsupported characters. Supported are: [a-zA-Z0-9_]</message>
+				</validation>
+			</validations>
+			<subNodes>
+				
+			
+			</subNodes>
+		</node>
+		<node id="InstanceDataSourceNode" inherits="AbstractDataSourceNode" name="instanceDataSource" label="Instance ({@mode}, {@prefix})">
+			<subNodes>
+				<subNode min="1" id="SelectedInstanceTablesNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="prefix" label="Input Prefix" type="string" required="true">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. inst.party) to distinguish each entity occurence.</description>
+				</attribute>
+				<attribute name="mode" label="Export Mode" type="enum" required="true" enumValues="full,delta" defaultValue="full">
+					<description>Export operation supports two modes of data providing:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;delta&lt;/kbd&gt;: provides data changes since last export operation launched with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;full&lt;/kbd&gt;: provides &lt;b&gt;all&lt;/b&gt; records from the entity with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="sourceSystem" label="Source System Filter" type="list" required="false">
+					<description>Export only instance records from selected system</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/systems/system[lower-case(@name) = /preview/systems/*/@name]/@name | 
+	/logicalModel/masterModels/masterModel/guiConfig[@guiSystem=/preview/systems/*/@name and @enableGui=&#39;true&#39;]/@guiSystem</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="scope" label="Scope" type="enum" required="true" enumValues="active,existing,use scope of parent export operation" defaultValue="use scope of parent export operation">
+					<description>Export scope definition. You can override the default settings from &lt;i&gt;Preferences&lt;/i&gt;
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt;: export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="false">
+					<description>Allows to export all available entities.</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;true&#39; and selectedTables/instanceTable]</expression>
+					<message>Option &quot;All Entities&quot; enabled. Remove selected entities from the list or disable option &quot;All Entities&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;false&#39; and not(selectedTables/instanceTable)]</expression>
+					<message>Neither &quot;All Entities&quot; option nor listed entities selection are present! Defene the list of exported entities or enable &quot;All Entities&quot; option.</message>
+				</validation>
+			</validations>
+			<description>Data provider to export data from instance layer</description>
+		</node>
+		<node id="MasterDataSourceNode" inherits="AbstractDataSourceNode" name="masterDataSource" label="Master ({@layerName}, {@mode}, {@prefix})">
+			<attributes>
+				<attribute name="prefix" label="Input Prefix" type="string" required="true">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. mas.party) to distinguish each entity occurence.</description>
+				</attribute>
+				<attribute name="mode" label="Export Mode" type="enum" required="true" enumValues="full,delta" defaultValue="full">
+					<description>Export operation supports two modes of data providing:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;delta&lt;/kbd&gt;: provides data changes since last export operation launched with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;full&lt;/kbd&gt;: provides &lt;b&gt;all&lt;/b&gt; records from the entity with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="scope" label="Scope" type="enum" required="true" enumValues="active,existing,use scope of parent export operation" defaultValue="use scope of parent export operation">
+					<description>Export scope definition. You can override the default settings from &lt;i&gt;Preferences&lt;/i&gt;
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt;: export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="layerName" label="Master Layer Name" type="list" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/masterModels/*</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+					<description>Export only records from selected Master Layer of &lt;i&gt;Logical Model&lt;/i&gt;</description>
+				</attribute>
+				<attribute name="allEntities" label="All Entities" type="boolean" required="true" defaultValue="false">
+					<description>Allows to export all available entities.</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="SelectedMasterTablesNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;true&#39; and selectedTables/table]</expression>
+					<message>Option &quot;All Entities&quot; enabled. Remove selected entities from the list or disable option &quot;All Entities&quot;.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allEntities=&#39;false&#39; and not(selectedTables/table)]</expression>
+					<message>Neither &quot;All Entities&quot; option nor listed entities selection are present! Defene the list of exported entities or enable &quot;All Entities&quot; option.</message>
+				</validation>
+			</validations>
+			<description>Data provider to export data from master layer</description>
+		</node>
+		<node id="SelectedMasterColumnsNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedMasterColumnNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[ancestor::conditionalMasterDataSource/@allColumns=&#39;false&#39; ]/column|.[ancestor::conditionalMasterDataSource/@allColumns=&#39;true&#39;]|.[ancestor::table/@allColumns=&#39;false&#39;]/column|ancestor::table[@allColumns=&#39;true&#39;]</expression>
+					<message>Master entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+			<description>Exported entity attributes</description>
+		</node>
+		<node id="SelectedInstanceColumnsNode" name="columns" label="Columns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="SelectedInstanceColumnNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[ancestor::conditionalInstanceDataSource/@allColumns=&#39;false&#39; ]/column|.[ancestor::conditionalInstanceDataSource/@allColumns=&#39;true&#39;]|.[ancestor::instanceTable/@allColumns=&#39;false&#39;]/column|ancestor::instanceTable[@allColumns=&#39;true&#39;]</expression>
+					<message>Instance entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+			<description>Exported entity attributes</description>
+		</node>
+		<node id="SelectedMasterColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Attribute name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/masterTables/physicalTable[@name=lower-case($current/ancestor::table/@name) and (@layerName=lower-case($current/ancestor::fullMasterExport/@layerName) or @layerName=lower-case($current/ancestor::masterDataSource/@layerName))]/columns/column|
+	/preview/databaseModel/masterTables/physicalTable[@name=lower-case($current/ancestor::conditionalMasterDataSource/@entityName) and (@layerName=lower-case($current/ancestor::fullMasterExport/@layerName) or @layerName=lower-case($current/ancestor::conditionalMasterDataSource/@layerName))]/columns/column|
+    $current/ancestor::masterDataSource[@mode=&#39;delta&#39;]/../../metaColumns/metaColumn|
+    $current/ancestor::conditionalMasterDataSource[@mode=&#39;delta&#39;]/../../metaColumns/metaColumn
+	</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="SelectedInstanceColumnNode" name="column" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Attribute name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::instanceTable/@name)]/columns/column
+						|/preview/databaseModel/refData/physicalTable[@name=lower-case($current/ancestor::instanceTable/@name)]/columns/column
+						|/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::conditionalInstanceDataSource/@entityName)]/columns/column
+						|/preview/databaseModel/refData/physicalTable[@name=lower-case($current/ancestor::conditionalInstanceDataSource/@entityName)]/columns/column
+						|$current/ancestor::instanceDataSource[@mode=&#39;delta&#39;]/../../metaColumns/metaColumn
+						|$current/ancestor::conditionalInstanceDataSource[@mode=&#39;delta&#39;]/../../metaColumns/metaColumn
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="ConditionalMasterDataSourceNode" inherits="AbstractDataSourceNode" name="conditionalMasterDataSource" label="Conditional Master ({@layerName} - {@entityName}, {@mode}, {@prefix})">
+			<subNodes>
+				<subNode min="1" id="ConditionsNode" max="1"/>
+				<subNode min="1" id="SelectedMasterColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="prefix" label="Prefix" type="string" required="true">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. condInst.party) to distinguish each entity occurence.</description>
+				</attribute>
+				<attribute name="layerName" label="Master Layer Name" type="list" required="true">
+					<description>Exported Master Layer name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/logicalModel/masterModels/*</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="entityName" label="Entity Name" type="string" required="true">
+					<description>Exported Entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+							/logicalModel/masterModels/*[lower-case(@name) = lower-case($current/../@layerName)]/masterTables/*
+						
+						</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="mode" label="Mode" type="enum" required="true" enumValues="full,delta" defaultValue="full">
+					<description>Export operation supports two modes of data providing:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;delta&lt;/kbd&gt;: provides data changes since last export operation launched with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;full&lt;/kbd&gt;: provides &lt;b&gt;all&lt;/b&gt; records from the entity with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="scope" label="Scope" type="enum" required="true" enumValues="active,existing,use scope of parent export operation" defaultValue="use scope of parent export operation">
+					<description>Export scope definition. You can override the default settings from &lt;i&gt;Preferences&lt;/i&gt;
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt;: export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this entity including MDM Engine auditing columns</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and columns/column]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>Conditional data provider to export data from master layer</description>
+		</node>
+		<node id="ConditionalInstanceDataSourceNode" inherits="AbstractDataSourceNode" name="conditionalInstanceDataSource" label="Conditional Instance ({@entityName}, {@mode}, {@prefix})">
+			<subNodes>
+				<subNode min="1" id="ConditionsNode" max="1"/>
+				<subNode min="1" id="SelectedInstanceColumnsNode" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="prefix" label="Prefix" type="string" required="true">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. condMas.party) to distinguish each entity occurence.</description>
+				</attribute>
+				<attribute name="entityName" label="Entity Name" type="list" required="true">
+					<description>Exported Entity name</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>/logicalModel/instanceModel/*/table|
+						/preview/databaseModel/refData/physicalTable[@layerName!= &#39;&#39;]</selectPath>
+						<valueTemplate>{lower-case(@name)}</valueTemplate>
+						<labelTemplate>{lower-case(@name)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="mode" label="Mode" type="enum" required="true" enumValues="full,delta" defaultValue="full">
+					<description>Export operation supports two modes of data providing:
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;delta&lt;/kbd&gt;: provides data changes since last export operation launched with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;full&lt;/kbd&gt;: provides &lt;b&gt;all&lt;/b&gt; records from the entity with &lt;i&gt;Scope&lt;/i&gt; filter applied&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="sourceSystem" label="Source System Filter" type="list">
+					<description>Export only instance records from selected system</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/systems/system[lower-case(@name) = /preview/systems/*/@name]/@name | 
+	/logicalModel/masterModels/masterModel/guiConfig[@guiSystem=/preview/systems/*/@name and @enableGui=&#39;true&#39;]/@guiSystem</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="scope" label="Scope" type="enum" required="true" enumValues="active,existing,use scope of parent export operation" defaultValue="use scope of parent export operation">
+					<description>Export scope definition. You can override the default settings from &lt;i&gt;Preferences&lt;/i&gt;
+&lt;ul&gt;&lt;li&gt;&lt;kbd&gt;existing&lt;/kbd&gt;: export operation reads all records from MDM hub storage (including deactivated)&lt;/li&gt;
+&lt;li&gt;&lt;kbd&gt;active&lt;/kbd&gt;: export reads only active records from MDM hub storage&lt;/li&gt;&lt;/ul&gt;</description>
+				</attribute>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this entity including MDM Engine auditing columns</description>
+				</attribute>
+			</attributes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and columns/column]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>Conditional data provider to export data from instance layer</description>
+		</node>
+		<node id="ConditionsNode" name="conditions" label="Conditions" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ConditionNode" max="-1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.UniqueValuesValidation">
+					<selectPath>./condition/@column</selectPath>
+					<message>More conditions entered for column &quot;{.}&quot;.</message>
+				</validation>
+			</validations>
+			<description>Specific conditions performed on database level for record filtering (more conditions are evaluated as AND).</description>
+		</node>
+		<node id="ConditionNode" name="condition" label="{@description}">
+			<attributes>
+				<attribute name="column" label="Column" type="string" required="true">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+						/preview/databaseModel[$current/ancestor::conditionalInstanceDataSource]/instanceTables/physicalTable[@name=lower-case($current/ancestor::conditionalInstanceDataSource/@entityName)]/columns/column
+						|/preview/databaseModel[$current/ancestor::conditionalInstanceDataSource]/refData/physicalTable[@name=lower-case($current/ancestor::conditionalInstanceDataSource/@entityName)]/columns/column
+						|/preview/databaseModel[$current/ancestor::conditionalMasterDataSource]/masterTables/physicalTable[@name=lower-case($current/ancestor::conditionalMasterDataSource/@entityName)]/columns/column
+						</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+					<description>Column name on which the filter condition is based.</description>
+				</attribute>
+				<attribute name="operator" label="Operator" type="enum" required="true" enumValues="=,&gt;,&lt;,&gt;=,&lt;=,&lt;&gt;,LIKE" defaultValue="=">
+					<description>In case of using &quot;LIKE&quot; operator you can use &quot;*&quot; as symbol for any character (equivalent of % in SQL).</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>Value of the conditional expression. 
+The value format is expected and read in context of the defined column:
+&lt;ul&gt;&lt;li&gt;For column with STRING type, even numbers are read as string&lt;/li&gt;
+&lt;li&gt;For column with numeric type will non-numeric value invoke an error at the NME engine start&lt;/li&gt;
+&lt;li&gt;Column can be also a date type. Then the value can look like: &quot;1969-01-01&quot;&lt;/li&gt;
+&lt;/ul&gt;
+
+Quotes are added automatically.</description>
+				</attribute>
+				<attribute name="description" label="Description" type="text">
+					<description>Condition description</description>
+				</attribute>
+			</attributes>
+			<description>Specific condition for record filtering.</description>
+		</node>
+		<node id="metaColumnsNode" visible="false" generated="true" name="metaColumns" explorerLeaf="true">
+			<subNodes>
+				<subNode min="0" id="metaColumnNode" max="-1"/>
+			</subNodes>
+			<editors>
+				<editor openModal="true" class="com.ataccama.ame.core.editors.PropertyEditor"/>
+			</editors>
+			<description>&lt;!--metaColumns--&gt;</description>
+		</node>
+		<node id="metaColumnNode" visibleInParent="true" name="metaColumn" label="{@name}">
+			<attributes>
+				<attribute name="name" type="string"/>
+				<attribute name="type" type="string"/>
+			</attributes>
+		</node>
+		<node id="HistoryInstanceEntityDataSourceNode" inherits="AbstractDataSourceNode" name="historyInstanceEntityDataSource" label="History Instance ({@entity}, full, {@prefix})">
+			<attributes>
+				<attribute name="prefix" label="Input Prefix" type="string">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. instHist.party) to distinguish each entity occurence.
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+				<attribute name="entity" label="History Entity" type="string">
+					<description>Exported entity name from history tables
+&lt;!-- 1000 --&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/advancedSettings/historyPlugin/instanceTables/instanceTable</selectPath>
+						<valueTemplate>{lower-case(@entityName)}</valueTemplate>
+						<labelTemplate>{lower-case(@entityName)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="sourceSystem" label="Source System" type="string">
+					<description>Export only instance records from selected system from selected history entity
+&lt;!-- 1000 --&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider">
+						<selectPath>/systems/system[lower-case(@name) = /preview/systems/*/@name]/@name | 
+	/logicalModel/masterModels/masterModel/guiConfig[@guiSystem=/preview/systems/*/@name and @enableGui=&#39;true&#39;]/@guiSystem</selectPath>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this historical entity including MDM Engine auditing columns
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="HistoryInstanceColumnsNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>/advancedSettings/historyPlugin[@enable=&#39;true&#39;]</expression>
+					<message>History plugin is disabled. History Instance Data Source can&#39;t be used.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and historyInstanceColumns/historyInstanceColumn]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>History data provider to export data from instance history layer.
+&lt;!-- 1000 --&gt;</description>
+		</node>
+		<node id="HistoryMasterEntityDataSourceNode" inherits="AbstractDataSourceNode" name="historyMasterEntityDataSource" label="History Master ({cc/@layerName} - {cc/@entityName}, full, {@prefix})">
+			<attributes>
+				<attribute name="prefix" label="Input Prefix" type="string">
+					<description>The data source prefix is used in export plan to form the name of &lt;i&gt;Integration Input&lt;/i&gt; (e.g. mastHist.party) to distinguish each entity occurence.
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+				<attribute name="entity" label="History Entity" type="string">
+					<description>Exported entity name from history tables
+&lt;!-- 1000 --&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="false">
+						<selectPath>/advancedSettings/historyPlugin/masterTables/masterTable</selectPath>
+						<valueTemplate>{lower-case(@entityName)}</valueTemplate>
+						<labelTemplate>{lower-case(@entityName)}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+				<attribute name="allColumns" label="All Columns" type="boolean" required="true" defaultValue="true">
+					<description>Export all columns from this historical entity including MDM Engine auditing columns
+&lt;!-- 1000 --&gt;</description>
+				</attribute>
+			</attributes>
+			<subNodes>
+				<subNode min="1" id="HistoryMasterColumnsNode" max="1"/>
+				<subNode min="1" id="ccHistoryMasterDataSourceNode" max="1"/>
+			</subNodes>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>/advancedSettings/historyPlugin[@enable=&#39;true&#39;]</expression>
+					<message>History plugin is disabled. History Master Data Source can&#39;t be used.</message>
+				</validation>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation" inverseCondition="true">
+					<expression>.[@allColumns=&#39;true&#39; and historyMasterColumns/historyMasterColumn]</expression>
+					<message>Option &quot;All Columns&quot; enabled. Remove selected columns from the list or disable option &quot;All Columns&quot;.</message>
+				</validation>
+			</validations>
+			<description>History data provider to export data from master history layer.
+&lt;!-- 1000 --&gt;</description>
+		</node>
+		<node id="HistoryInstanceColumnsNode" name="historyInstanceColumns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="HistoryInstanceColumnNode" max="-1"/>
+			</subNodes>
+			<description>Exported entity attributes
+&lt;!-- 1000--&gt;</description>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[ancestor::historyInstanceEntityDataSource/@allColumns=&#39;false&#39; ]/historyInstanceColumn|.[ancestor::historyInstanceEntityDataSource/@allColumns=&#39;true&#39;]</expression>
+					<message>History Instance entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="HistoryInstanceColumnNode" name="historyInstanceColumn">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<description>Attribute name
+&lt;!-- 1000 --&gt;</description>
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+    					/advancedSettings/historyPlugin/metaColumns/metaColumn
+    					|/preview/databaseModel/instanceTables/physicalTable[@name=lower-case($current/ancestor::historyInstanceEntityDataSource/@entity) and /advancedSettings/historyPlugin/instanceTables/instanceTable[@allColumns=&#39;true&#39; and @entityName=$current/ancestor::historyInstanceEntityDataSource/@entity]]/columns/column[not(tokenize(@name, &#39;eng&#39;, 2)) and @name!=&#39;id&#39;]
+    					|/advancedSettings/historyPlugin/instanceTables/instanceTable[@allColumns=&#39;false&#39; and @entityName=$current/ancestor::historyInstanceEntityDataSource/@entity]/instanceColumns/instanceColumn[@name!=&#39;id&#39;]
+    					</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="HistoryMasterColumnsNode" name="historyMasterColumns" expanded="true">
+			<subNodes>
+				<subNode min="0" id="HistoryMasterColumnNode" max="-1"/>
+			</subNodes>
+			<description>Exported entity attributes
+&lt;!-- 1000--&gt;</description>
+			<validations>
+				<validation class="com.ataccama.ame.core.validations.MDPathValidation">
+					<expression>.[ancestor::historyMasterEntityDataSource/@allColumns=&#39;false&#39;]/historyMasterColumn|.[ancestor::historyMasterEntityDataSource/@allColumns=&#39;true&#39;]</expression>
+					<message>History Master entity has no defined columns to export!!</message>
+				</validation>
+			</validations>
+		</node>
+		<node id="HistoryMasterColumnNode" name="historyMasterColumn">
+			<attributes>
+				<attribute name="name" label="Name" type="string">
+					<valuesProvider class="com.ataccama.ame.core.assist.PathValuesProvider" fillColumns="true">
+						<selectPath>
+    					/advancedSettings/historyPlugin/metaColumns/metaColumn[@layer=&#39;master&#39;]
+    					|/preview/databaseModel/masterTables/physicalTable[@name=lower-case($current/ancestor::historyMasterEntityDataSource/cc/@entityName) and @layerName=lower-case($current/ancestor::historyMasterEntityDataSource/cc/@layerName) and /advancedSettings/historyPlugin/masterTables/masterTable[@allColumns=&#39;true&#39; and @entityName=$current/ancestor::historyMasterEntityDataSource/@entity]]/columns/column[not(tokenize(@name, &#39;eng&#39;, 2)) and @name!=&#39;id&#39;]
+    					|/advancedSettings/historyPlugin/masterTables/masterTable[@allColumns=&#39;false&#39; and @entityName=$current/ancestor::historyMasterEntityDataSource/@entity]/masterColumns/masterColumn[@name!=&#39;id&#39;]
+    					</selectPath>
+						<valueTemplate>{@name}</valueTemplate>
+						<labelTemplate>{@name}</labelTemplate>
+					</valuesProvider>
+				</attribute>
+			</attributes>
+			<description>Attribute name
+&lt;!-- 1000 --&gt;</description>
+		</node>
+		<node id="ccHistoryMasterDataSourceNode" visible="false" generated="true" name="cc">
+			<attributes>
+				<attribute name="entityName" type="string"/>
+				<attribute name="layerName" type="string"/>
+			</attributes>
+		</node>
+		<node id="AdvancedExportNode" visibleInParent="true" visible="true" generated="false" name="advanced" newTab="true" label="Advanced" expanded="true">
+			<subNodes>
+				<subNode min="1" id="PathVarsNode" max="1"/>
+				<subNode min="1" id="AdditionalParametersNode" max="1"/>
+			</subNodes>
+			<description>&lt;!--Advanced Export Node--&gt;</description>
+			<attributes>
+				<attribute name="enableTID" label="Export eng_*_tid columns " type="boolean" required="true" defaultValue="false">
+					<description>This option adding eng_*_tid columns into the export operation, i.e. columns are aaded into each Integration Input step.&lt;/br&gt;
+The following columns are added (all having LONG data type): 
+&lt;li&gt;eng_creation_tid&lt;/li&gt; 
+&lt;li&gt;eng_deletion_tid&lt;/li&gt; 
+&lt;li&gt;eng_last_update_tid&lt;/li&gt; 
+&lt;li&gt;eng_last_source_update_tid&lt;/li&gt; 
+&lt;li&gt;eng_activation_tid&lt;/li&gt; 
+&lt;li&gt;eng_deactivation_tid&lt;/li&gt;
+&lt;!-- 1050 --&gt;</description>
+				</attribute>
+			</attributes>
+		</node>
+		<node id="PathVarsNode" visibleInParent="true" name="pathVariables" label="Path Variables" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="ParthVarNode" max="-1"/>
+			</subNodes>
+			<description>List of PathVariables specified for the export operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="ParthVarNode" visibleInParent="true" name="pathVariable" label="Path Variable">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>PathVariable name that is referenced in an output step, e.g. BATCH_OUT</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>PathVariable value, e.g. ${pathVar_BATCH_OUT|XXXXINSTALL_DIRXXXX/cdi_hub/data/out}</description>
+				</attribute>
+			</attributes>
+			<description>Definition of PathVariable for the export operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="AdditionalParametersNode" visibleInParent="true" name="additionalParameters" label="Additional Parameters" explorerLeaf="true" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AdditionalParameterNode" max="-1"/>
+			</subNodes>
+			<description>Additional Parameters&#39; definition for the export operation
+&lt;!-- 1050 --&gt;</description>
+		</node>
+		<node id="AdditionalParameterNode" visibleInParent="false" name="additionalParameter" label="Additional Parameter">
+			<attributes>
+				<attribute name="name" label="Name" type="string" required="true">
+					<description>Parameter name</description>
+				</attribute>
+				<attribute name="value" label="Value" type="string" required="true">
+					<description>Parameter value</description>
+				</attribute>
+			</attributes>
+			<description>Addition Parameter definition
+&lt;!-- 1050 --&gt;</description>
+		</node>
+	</nodes>
+</metametadata-library>

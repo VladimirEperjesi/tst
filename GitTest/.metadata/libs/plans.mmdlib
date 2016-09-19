@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metametadata-library>
+	<nodes>
+		<node id="TransformationsNode" abstract="false" visibleInParent="true" icon="icons/plans.png" visible="true" generated="true" name="transformations" label="Transformations">
+			<subNodes>
+				<subNode min="0" id="EntityNode" max="-1"/>
+			</subNodes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+		</gen>
+			</generators>
+			<description>Transformations show a list of an auto-generated plan files that are derived from the Logical Model per each entity defined. Each plan has pre-generated input and output interface - the logic has to be completed manually. &lt;br/&gt;
+		In the MDM hub context, a plan is used for transition between two neighboring logical layers.&lt;br/&gt;
+&lt;li&gt;&lt;i&gt;Cleanse plan&lt;/i&gt; - defines the cleansing, standardization and validation logic. It serves as a transition between L1 and L2.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;Match plan&lt;/i&gt; - defines the match (or de-duplication) logic and allows performing aggregate calculations. It serves as a transition between L2 and L3.&lt;/li&gt;
+&lt;li&gt;&lt;i&gt;Merge plan&lt;/i&gt; - defines the logic for creating a golden (master) record from a group of instance records. It also allows performing aggregate calculations. All values from previous steps are available here. It serves as a transition between L3 and L4 and also between the Instance and Master Layer&lt;/li&gt;</description>
+		</node>
+		<node id="EntityNode" icon="icons/plans.png" name="entity" label="{@name}">
+			<subNodes>
+				<subNode min="1" id="PlansNode" max="1"/>
+				<subNode min="1" id="DummyPlanForCopyColumns" max="1"/>
+			</subNodes>
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.PlaceholderGenerator">
+		</gen>
+			</generators>
+			<description>Definition of Transformations for all implemented entities.</description>
+		</node>
+		<node id="PlansNode" sortChildren="false" name="plans" label="Plans" expanded="true">
+			<subNodes>
+				<subNode min="0" id="AbstractPlanNode" max="-1"/>
+			</subNodes>
+			<description>Definition of Transformation plans for a particular entity</description>
+		</node>
+		<node id="AbstractPlanNode" abstract="true" icon="icons/plan.png" name="plan" label="{@name}">
+			<attributes>
+				<attribute name="name" label="Plan Name" type="string"/>
+				<attribute name="entity" label="Entity Name" type="string"/>
+				<attribute name="layerName" label="Layer Name" type="string"/>
+				<attribute name="instanceEntity" label="Instance Entity" type="string"/>
+			</attributes>
+			<editors>
+				<editor class="com.ataccama.ame.core.editors.FileOpener" fileNameTemplate="Files/engine/trans/{@instanceEntity}/{@name}.comp"/>
+			</editors>
+			<subNodes>
+				
+			</subNodes>
+		</node>
+		<node id="CleansingPlanNode" inherits="AbstractPlanNode" name="cleansingPlan" label="{@name}">
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/trans/{@instanceEntity}/{@name}.comp</fileNameTemplate>
+					<source>/preview/databaseModel/instanceTables/*[@name=$current/@entity]</source>
+					<parameters>
+						<param source="/logicalModel" name="logicalModel"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_plan_cleansing.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Cleansing plan</description>
+		</node>
+		<node id="MatchingPlanNode" inherits="AbstractPlanNode" name="matchingPlan" label="{@name}">
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/trans/{@instanceEntity}/{@name}.comp</fileNameTemplate>
+					<source>/preview/databaseModel/instanceTables/*[@name=$current/@entity]</source>
+					<parameters>
+						<param source="/logicalModel" name="logicalModel"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_plan_matching.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Matching plan</description>
+		</node>
+		<node id="AggregationPlanNode" inherits="AbstractPlanNode" name="aggregationPlan" label="{@name}">
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/trans/{@instanceEntity}/{@name}.comp</fileNameTemplate>
+					<source>/preview/databaseModel/instanceTables/*[@name=$current/@instanceEntity]</source>
+					<parameters>
+						<param source="/preview/databaseModel/masterTables/*[@name=$current/@entity and @layerName=$current/@layerName]" name="master"/>
+						<param source="/logicalModel" name="logicalModel"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_plan_aggregation.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Aggregation plan</description>
+		</node>
+		<node id="MergingPlanNode" inherits="AbstractPlanNode" name="mergingPlan" label="{@name}">
+			<generators>
+				<gen class="com.ataccama.ame.core.generators.XsltPlanFileGenerator">
+					<fileNameTemplate>Files/engine/trans/{@instanceEntity}/{@name}.comp</fileNameTemplate>
+					<source>/preview/databaseModel/instanceTables/*[@name=$current/@instanceEntity]</source>
+					<parameters>
+						<param source="/preview/databaseModel/masterTables/*[@name=$current/@entity and @layerName=$current/@layerName]" name="master"/>
+						<param source="/logicalModel" name="logicalModel"/>
+						<param source="/settings" name="settings"/>
+					</parameters>
+					<templatePath>xslt/gen_plan_merging.xsl</templatePath>
+				</gen>
+			</generators>
+			<description>Merging plan</description>
+		</node>
+		<node id="DummyPlanForCopyColumns" visibleInParent="false" sortChildren="false" visible="false" name="dummy" label="Dummy">
+			<attributes>
+				<attribute name="name" type="string"/>
+			</attributes>
+		</node>
+	</nodes>
+</metametadata-library>
