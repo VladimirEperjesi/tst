@@ -4,11 +4,11 @@
 	<model>
 		<relationships/>
 		<tables>
-			<table name="Objednavka" elemId="4255">
+			<table name="OBJEDNAVKA" elemId="4255">
 				<description></description>
 				<columns/>
 			</table>
-			<table name="Produktova dimenze" elemId="4266">
+			<table name="PRODUKTOVA DIMENZE" elemId="4266">
 				<description></description>
 				<columns/>
 			</table>
