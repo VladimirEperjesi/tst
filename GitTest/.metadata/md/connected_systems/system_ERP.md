@@ -12,6 +12,14 @@
 				<description>malym pismenom!!!</description>
 				<columns/>
 			</table>
+			<table name="Table1" elemId="4460">
+				<description></description>
+				<columns/>
+			</table>
+			<table name="Table2" elemId="4474">
+				<description></description>
+				<columns/>
+			</table>
 		</tables>
 	</model>
 	<sourceMappings/>
