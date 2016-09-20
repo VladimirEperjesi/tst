@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serviceConfig>
+	<services>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.GetInstanceByIdServiceBundle"/>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.GetMasterByIdServiceBundle"/>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.GenericTraversalMasterService"/>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.SearchInstancesServiceBundle"/>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.SearchMastersServiceBundle"/>
+		<service class="com.ataccama.nme.internal.engine.services.handlers.BatchControlServiceBundle"/>
+	</services>
+	<endpoints/>
+	<accessControlHandlers/>
+</serviceConfig>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+	<instanceLayer>
+		<entities/>
+		<sourceSystems>
+			<system name="ERP">
+				<instanceMappings/>
+			</system>
+		</sourceSystems>
+	</instanceLayer>
+	<masterLayers/>
+	<eventHandlersConfigFile>nme-event_handler.gen.xml</eventHandlersConfigFile>
+</model>

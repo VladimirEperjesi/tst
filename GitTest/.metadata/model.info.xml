@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+	<item path="/systems[0]/model">
+		<positions>
+			<item id="4255" value="119,106,100,100"/>
+			<item id="4266" value="331,108,123,45"/>
+		</positions>
+	</item>
+</root>
