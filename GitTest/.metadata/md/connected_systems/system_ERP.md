@@ -4,12 +4,12 @@
 	<model>
 		<relationships/>
 		<tables>
-			<table name="OBJEDNAVKA" elemId="4255">
-				<description></description>
+			<table name="Objednavka" elemId="4255">
+				<description>malym pismenom!!!</description>
 				<columns/>
 			</table>
-			<table name="PRODUKTOVA DIMENZE" elemId="4266">
-				<description></description>
+			<table name="Produktova dimenzia" elemId="4266">
+				<description>malym pismenom!!!</description>
 				<columns/>
 			</table>
 		</tables>
